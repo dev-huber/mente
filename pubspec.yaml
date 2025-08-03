@@ -1,0 +1,60 @@
+name: mentira_app
+description: Aplicativo com IA para detecção de dissimulação e mentiras
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Audio recording and processing
+  audio_recorder: ^3.0.0
+  flutter_sound: ^9.2.13
+  permission_handler: ^11.0.1
+  
+  # HTTP and networking
+  http: ^1.1.0
+  dio: ^5.3.2
+  
+  # State management and reactive programming
+  provider: ^6.0.5
+  rxdart: ^0.27.7
+  
+  # Storage and caching
+  shared_preferences: ^2.2.2
+  path_provider: ^2.1.1
+  
+  # Logging and debugging
+  logger: ^2.0.2+1
+  
+  # UI and animations
+  flutter_spinkit: ^5.2.0
+  lottie: ^2.7.0
+  
+  # Utilities
+  uuid: ^4.1.0
+  intl: ^0.18.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  mockito: ^5.4.2
+  build_runner: ^2.4.7
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/images/
+    - assets/animations/
+  
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700

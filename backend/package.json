@@ -1,0 +1,62 @@
+{
+  "name": "mentira-app-backend",
+  "version": "1.0.0",
+  "description": "Azure Functions backend for Quem Mente Menos app with defensive architecture",
+  "main": "src/functions/*.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "prestart": "npm run build",
+    "start": "func start",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix"
+  },
+  "dependencies": {
+    "@azure/ai-language-text": "^1.1.0",
+    "@azure/functions": "^4.0.1",
+    "@azure/openai": "^1.0.0-beta.8",
+    "@azure/storage-blob": "^12.17.0",
+    "joi": "^17.11.0",
+    "microsoft-cognitiveservices-speech-sdk": "^1.31.0",
+    "multer": "^1.4.5-lts.1",
+    "retry": "^0.13.1",
+    "sharp": "^0.32.6",
+    "uuid": "^9.0.1",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "@types/node": "^20.8.0",
+    "@types/uuid": "^9.0.5",
+    "@typescript-eslint/eslint-plugin": "^6.7.5",
+    "@typescript-eslint/parser": "^6.7.5",
+    "eslint": "^8.51.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.4.0",
+    "typescript": "^5.2.2"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/test/**/*.test.ts"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.ts",
+      "!src/**/*.d.ts",
+      "!src/functions/*.ts"
+    ],
+    "coverageDirectory": "coverage",
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "html"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

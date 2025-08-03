@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "microsoft-cognitiveservices-speech-sdk": "^1.45.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.1.0"
+  }
+}
