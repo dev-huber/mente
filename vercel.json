@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "quem-mente-menos-api",
   "builds": [
     {
       "src": "backend/src/index.ts",

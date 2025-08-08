@@ -30,3 +30,4 @@ coverage/
 # MCP/Secrets
 mcp.json
 .vscode/mcp.json
+.vercel
