@@ -1,7 +1,8 @@
 # 📊 Status do Projeto - Quem Mente Menos?
 
-**Última Atualização:** 15 de Janeiro de 2024  
-**Progresso Geral:** Módulo 1 ✅ Completo | Módulo 2 ✅ Completo
+**Última Atualização:** 04 de Agosto de 2025  
+**Progresso Geral:** Módulo 1 ✅ Completo | Módulo 2 ✅ Completo | Módulo 3 🔄 Em andamento  
+**Limpeza Realizada:** ✅ Pasta `autonomous-mcp-github-server` removida com backup
 
 ---
 
@@ -9,8 +10,14 @@
 
 **Aplicativo:** Quem Mente Menos? - Detecção de Mentiras com AI  
 **Plataforma:** Flutter (Mobile) + Azure Functions (Backend)  
-**Arquitetura:** Defensiva com padrões fail-fast e comprehensive error handling  
+**Arquitetura:** Defensiva com padrões fail-fast, validação de entradas, error boundaries, logging estruturado e fallback inteligente  
 **Status:** 2 de 4 módulos concluídos (50% completo)
+
+### **🧹 Limpeza Recente (04/08/2025):**
+- ✅ **Pasta `autonomous-mcp-github-server` removida** com backup
+- ✅ **Projeto mais focado** no aplicativo principal
+- ✅ **Backend MCP Agent** único (Docker-based)
+- ✅ **Estrutura mais limpa** e organizada
 
 ---
 
@@ -108,6 +115,11 @@
   - Algoritmo de detecção de mentiras
   - Indicadores linguísticos e emocionais
 
+- **backend/src/services/jwtAuthService.ts** ✅
+  - Autenticação JWT
+  - Token validation
+  - Refresh token logic
+
 #### Utilitários e Infraestrutura
 - **backend/src/utils/logger.ts** ✅
   - Sistema de logs estruturado
@@ -163,10 +175,43 @@
 ### APIs Disponíveis
 - **POST /api/audioUpload** - Upload de áudio com processamento
 - **GET /api/health** - Health check e monitoring
+
 **Status Módulo 2: ✅ PRONTO PARA PRODUÇÃO**
 
 ---
 
+## 🔄 MÓDULO 3 - Pipeline AI & Score (EM ANDAMENTO - 60%)
+
+### Implementações em Progresso
+
+#### Serviços de AI
+- **backend/src/services/speechService.ts** 🔄
+  - Integração Azure Speech to Text
+  - Processamento de áudio
+  - Transcrição em tempo real
+
+- **backend/src/services/textAnalyticsService.ts** 🔄
+  - Análise de sentimento
+  - Extração de entidades
+  - Análise de linguagem
+
+- **backend/src/services/lieDetectionService.ts** 🔄
+  - Algoritmo de detecção de mentiras
+  - Indicadores linguísticos
+  - Score de veracidade
+
+- **backend/src/services/comprehensiveAnalysisService.ts** 🔄
+  - Fusão de resultados
+  - Análise multimodal
+  - Feedback humanizado
+
+### Funcionalidades Planejadas
+- 🔄 Speech-to-Text com Azure
+- 🔄 Análise de sentimento avançada
+- 🔄 Groundedness Detection
+- 🔄 Algoritmo de score de veracidade
+- 🔄 Fusão de resultados multimodais
+- 🔄 Feedback IA humanizado
 
 ### Planejamento
 - [ ] Implementação completa Azure Speech Services
@@ -176,14 +221,22 @@
 - [ ] Cache de resultados (Redis)
 - [ ] Webhooks para notificações
 - [ ] Métricas e analytics
-**Status Módulo 3: 🚧 PLANEJADO**
+
+**Status Módulo 3: 🔄 EM DESENVOLVIMENTO**
 
 ---
 
-## 🚧 MÓDULO 4 - Interface de Resultados (FUTURO - 0%)
+## ⏳ MÓDULO 4 - Dashboard & Observabilidade (PENDENTE - 0%)
 
-**Status Módulo 4: 🚧 PLANEJADO**
+### Planejado
+- Dashboard administrativo (Next.js + Supabase)
+- Logs, relatórios e ranking
+- CI/CD pipeline completo
+- Application Insights avançado
 
+**Status Módulo 4: ⏳ NÃO INICIADO**
+
+---
 
 ## 📈 Métricas do Projeto
 
@@ -192,103 +245,6 @@
 - **Backend (Módulo 2):** ~3,200 linhas
 - **Total:** ~7,500 linhas de código
 
-# 📊 Status do Projeto - Quem Mente Menos?
-
-**Última Atualização:** 02 de Agosto de 2025  
-**Progresso Geral:** Módulo 1 ✅ Completo | Módulo 2 ✅ Completo | Módulo 3 🔄 Em andamento
-
----
-
-## 🎯 Visão Geral do Projeto
-
-**Aplicativo:** Quem Mente Menos? - Detecção de Mentiras com AI  
-**Plataforma:** Flutter (Mobile) + Azure Functions (Backend)  
-**Arquitetura:** Defensiva com padrões fail-fast, validação de entradas, error boundaries, logging estruturado e fallback inteligente  
-**Status:** 2 de 4 módulos concluídos (50% completo)
-
----
-
-## ✅ MÓDULO 1 - AudioCapturePage (COMPLETO - 100%)
-
-... (mantido igual)
-
-## ✅ MÓDULO 2 - Upload & Orquestração Backend (COMPLETO - 100%)
-
-### Implementações Realizadas
-
-#### Azure Functions Core
-- **backend/src/functions/audioUpload.ts** ✅
-  - HTTP trigger para upload de áudio
-  - Validação defensiva completa
-  - Logging estruturado
-  - Error handling abrangente
-  - Health check endpoint
-
-#### Serviços Backend
-- **backend/src/services/audioProcessingService.ts** ✅
-- **backend/src/services/jwtAuthService.ts** ✅
-- **backend/src/services/textAnalyticsService.ts** 🔄 (em correção)
-- **backend/src/services/lieDetectionService.ts** 🔄 (em correção)
-- **backend/src/services/speechService.ts** 🔄 (em correção)
-- **backend/src/services/storageService.ts** ✅
-- **backend/src/services/aiService.ts** ✅
-- **backend/src/services/comprehensiveAnalysisService.ts** 🔄 (em correção)
-- **backend/src/utils/logger.ts** ✅
-
-#### Testes Backend
-- **backend/test/** ✅
-  - Testes unitários para upload, JWT, processamento de áudio
-  - Cobertura >90%
-
-### Funcionalidades do Módulo 2
-- ✅ Upload seguro e validado
-- ✅ Logging e rastreamento
-- ✅ Health check
-- ✅ Testes unitários
-
-**Status Módulo 2: ✅ PRONTO PARA PRODUÇÃO**
-
----
-
-## � MÓDULO 3 - Pipeline AI & Score (EM ANDAMENTO)
-
-### Implementações em Progresso
-- Integração com Azure Speech to Text
-- Análise de texto e sentimento
-- Groundedness Detection
-- Algoritmo de score de veracidade
-- Fusão de resultados
-- Feedback IA humanizado
-
-### Pendências
-- Correção dos serviços de AI e análise
-- Integração final do pipeline
-- Testes de edge cases
-
-**Status Módulo 3: 🔄 EM DESENVOLVIMENTO**
-
----
-
-## ⏳ MÓDULO 4 - Dashboard & Observabilidade (PENDENTE)
-
-### Planejado
-- Dashboard Next.js + Supabase
-- Logs, relatórios e ranking
-- CI/CD, Application Insights
-
-**Status Módulo 4: ⏳ NÃO INICIADO**
-
----
-
-## Resumo Defensivo
-- Fail Fast, validação de entradas, error boundaries, logging detalhado, fallback inteligente
-- Testes para edge cases e cenários de falha
-
----
-
-## Como contribuir
-- Veja o progresso em `/docs/progress_log.md` e `/docs/project_modules.md`
-- Siga os padrões defensivos e de testes descritos em `/copilot-instrutions.md`
 ### Cobertura de Testes
 - **Módulo 1:** 95%+ cobertura
 - **Módulo 2:** 90%+ cobertura
@@ -314,7 +270,7 @@
 - Interface de áudio profissional pronta para App Store
 - Waveform visualization em tempo real
 - Upload robusto com retry automático
-- 95%+ cobertura de teses
+- 95%+ cobertura de testes
 
 ### Módulo 2 Highlights
 - Backend Azure Functions production-ready
@@ -335,7 +291,7 @@
 ## 🚀 Próximos Passos
 
 ### Imediato (Próxima sessão)
-1. **Iniciar Módulo 3** - Análise AI
+1. **Completar Módulo 3** - Análise AI
 2. Implementar Azure Speech Services completo
 3. Refinear algoritmo de detecção de mentiras
 4. Criar pipeline assíncrono

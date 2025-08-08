@@ -12,7 +12,7 @@ class AudioUploadService {
 
   final Logger _logger = Logger();
   final Dio _dio = Dio();
-  static const String _apiEndpoint = 'https://api.quemmentemenos.com/upload/audio';
+  static const String _apiEndpoint = 'http://localhost:7071/api/audioUpload';
   static const int _maxRetries = 3;
   static const Duration _timeoutDuration = Duration(seconds: 30);
 
@@ -318,7 +318,7 @@ class AudioUploadService {
   /// Check upload service health
   Future<AudioUploadResult<bool>> checkHealth() async {
     try {
-      final healthEndpoint = _apiEndpoint.replaceAll('/upload/audio', '/health');
+      final healthEndpoint = _apiEndpoint.replaceAll('/audioUpload', '/health');
       
       final response = await _dio.get(
         healthEndpoint,

@@ -11,6 +11,10 @@ const logger_1 = require("../utils/logger");
  * Defensive Azure Blob Storage client with retry logic and comprehensive error handling
  */
 class AudioStorageService {
+    blobServiceClient;
+    containerName;
+    maxRetries;
+    retryDelayMs;
     constructor(config) {
         this.validateConfig(config);
         this.blobServiceClient = storage_blob_1.BlobServiceClient.fromConnectionString(config.connectionString);
@@ -110,11 +114,11 @@ class AudioStorageService {
             logger_1.logger.error('All upload attempts failed', {
                 ...uploadContext,
                 attempts: this.maxRetries,
-                finalError: lastError === null || lastError === void 0 ? void 0 : lastError.message
+                finalError: lastError?.message
             });
             return {
                 success: false,
-                error: `Upload failed after ${this.maxRetries} attempts: ${lastError === null || lastError === void 0 ? void 0 : lastError.message}`
+                error: `Upload failed after ${this.maxRetries} attempts: ${lastError?.message}`
             };
         }
         catch (error) {
@@ -361,4 +365,3 @@ function createAudioStorageService() {
 }
 // Export singleton instance
 exports.audioStorageService = createAudioStorageService();
-//# sourceMappingURL=storageService.js.map

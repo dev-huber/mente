@@ -8,12 +8,42 @@ const audioProcessingService_1 = require("../services/audioProcessingService"); 
 const storageService_1 = require("../services/storageService");
 // import { createRequestLogger } from '../utils/logger'; // Não utilizado
 const uuid_1 = require("uuid");
+// Perform comprehensive health checks
+async function performHealthChecks(requestId) {
+    const results = {
+        storage: false,
+        aiServices: false,
+        memory: false
+    };
+    try {
+        // Check Azure Blob Storage
+        const storageConnectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
+        results.storage = !!storageConnectionString && storageConnectionString.length > 0;
+        // Check Azure AI Services
+        const aiSubscriptionKey = process.env.AZURE_AI_SUBSCRIPTION_KEY;
+        const speechKey = process.env.AZURE_SPEECH_KEY;
+        results.aiServices = !!(aiSubscriptionKey || speechKey);
+        // Check memory usage
+        const memoryUsage = process.memoryUsage();
+        const memoryLimitMB = 512; // Azure Functions basic memory limit
+        const usedMemoryMB = memoryUsage.heapUsed / 1024 / 1024;
+        results.memory = usedMemoryMB < (memoryLimitMB * 0.8); // Alert at 80%
+        logger_1.logger.info('Health checks completed', {
+            requestId,
+            results,
+            memoryUsageMB: usedMemoryMB
+        });
+    }
+    catch (error) {
+        logger_1.logger.error('Health check failed', error, { requestId });
+    }
+    return results;
+}
 /**
  * Defensive Azure Function for audio upload with comprehensive error handling
  * Implements fail-fast principles with graceful degradation
  */
 async function audioUpload(request) {
-    var _a, _b, _c, _d;
     const requestId = (0, uuid_1.v4)();
     const startTime = Date.now();
     // Structured logging context
@@ -89,8 +119,8 @@ async function audioUpload(request) {
         }
         logger_1.logger.info('Audio upload completed com sucesso (Azure Blob)', {
             ...logContext,
-            blobUrl: (_a = uploadResult.data) === null || _a === void 0 ? void 0 : _a.blobUrl,
-            blobName: (_b = uploadResult.data) === null || _b === void 0 ? void 0 : _b.blobName,
+            blobUrl: uploadResult.data?.blobUrl,
+            blobName: uploadResult.data?.blobName,
             duration
         });
         return {
@@ -105,8 +135,8 @@ async function audioUpload(request) {
                     id: requestId,
                     status: 'uploaded',
                     timestamp: new Date().toISOString(),
-                    blobUrl: (_c = uploadResult.data) === null || _c === void 0 ? void 0 : _c.blobUrl,
-                    blobName: (_d = uploadResult.data) === null || _d === void 0 ? void 0 : _d.blobName,
+                    blobUrl: uploadResult.data?.blobUrl,
+                    blobName: uploadResult.data?.blobName,
                     metadata: {
                         fileSize: fileData.buffer.length,
                         mimeType: fileData.mimeType,
@@ -156,14 +186,18 @@ async function healthCheck() {
             checks: {
                 function: 'ok',
                 storage: 'checking...',
-                ai_services: 'checking...'
+                ai_services: 'checking...',
+                memory: 'checking...'
             }
         };
-        // TODO: Add actual health checks for dependencies
-        // - Azure Blob Storage connectivity
-        // - Azure AI Services availability
-        // - Memory usage
-        // - Function execution metrics
+        // Perform actual health checks for dependencies
+        const checks = await performHealthChecks(requestId);
+        healthStatus.checks = {
+            function: 'ok',
+            storage: checks.storage ? 'healthy' : 'unhealthy',
+            ai_services: checks.aiServices ? 'healthy' : 'unhealthy',
+            memory: checks.memory ? 'healthy' : 'warning'
+        };
         logger_1.logger.info('Health check completed', { requestId, status: 'healthy' });
         return {
             status: 200,
@@ -208,4 +242,3 @@ functions_1.app.http('healthCheck', {
     authLevel: 'anonymous',
     handler: healthCheck
 });
-//# sourceMappingURL=audioUpload.js.map

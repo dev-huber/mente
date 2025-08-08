@@ -1,71 +1,35 @@
 /**
- * Shared logger utility for Azure Functions with defensive logging patterns
+ * Sistema de logging defensivo com Winston
+ * Implementa structured logging para debugging eficaz
  */
 export interface LogContext {
     requestId?: string;
     userId?: string;
-    functionName?: string;
-    timestamp?: string;
-    [key: string]: any;
+    operation?: string;
+    service?: string;
+    duration?: number;
+    metadata?: Record<string, unknown>;
+    [key: string]: unknown;
 }
-export interface LogEntry {
-    level: 'info' | 'warn' | 'error' | 'debug';
-    message: string;
-    context?: LogContext;
-    error?: {
-        message: string;
-        stack?: string | undefined;
-        name?: string | undefined;
-    } | undefined;
+declare class DefensiveLogger {
+    private logger;
+    private telemetryClient?;
+    private defaultContext;
+    constructor();
+    private getTransports;
+    setDefaultContext(context: LogContext): void;
+    private enrichContext;
+    private sanitize;
+    info(message: string, context?: LogContext): void;
+    warn(message: string, context?: LogContext): void;
+    error(message: string, error: Error | unknown, context?: LogContext): void;
+    debug(message: string, context?: LogContext): void;
+    trace(message: string, context?: LogContext): void;
+    startTimer(): () => void;
+    metric(name: string, value: number, context?: LogContext): void;
 }
-/**
- * Structured logger with defensive error handling
- */
-declare class Logger {
-    private context;
-    constructor(defaultContext?: LogContext);
-    /**
-     * Set global context for all log entries
-     */
-    setContext(context: LogContext): void;
-    /**
-     * Log info message with context
-     */
-    info(message: string, additionalContext?: LogContext): void;
-    /**
-     * Log warning message with context
-     */
-    warn(message: string, additionalContext?: LogContext): void;
-    /**
-     * Log error message with context and error details
-     */
-    error(message: string, additionalContext?: LogContext): void;
-    /**
-     * Log debug message with context (only in development)
-     */
-    debug(message: string, additionalContext?: LogContext): void;
-    /**
-     * Create a child logger with additional context
-     */
-    child(childContext: LogContext): Logger;
-    /**
-     * Internal log method that outputs structured logs
-     */
-    private log;
-    /**
-     * Merge additional context with global context
-     */
-    private mergeContext;
-    /**
-     * Format log entry for console output
-     */
-    private formatLogEntry;
-    /**
-     * Send logs to external logging service (placeholder for production)
-     */
-    private sendToExternalLogger;
-}
-export declare const logger: Logger;
-export { Logger };
-export declare function createRequestLogger(requestId: string, additionalContext?: LogContext): Logger;
+export declare const logger: DefensiveLogger;
+export declare function createLogger(context?: LogContext): DefensiveLogger;
+export declare function createRequestLogger(requestId?: string): DefensiveLogger;
+export { DefensiveLogger };
 //# sourceMappingURL=logger.d.ts.map

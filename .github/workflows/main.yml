@@ -1,0 +1,305 @@
+name: CI/CD Pipeline - Quem Mente Menos
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20.x'
+  FLUTTER_VERSION: '3.24.0'
+  AZURE_FUNCTIONAPP_NAME: 'quem-mente-menos-api'
+  RESOURCE_GROUP: 'rg-quem-mente-menos'
+
+jobs:
+  # Backend Tests and Analysis
+  backend-quality:
+    name: Backend Quality Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: backend
+        run: npm ci
+      
+      - name: Run linting
+        working-directory: backend
+        run: npm run lint
+      
+      - name: Run type checking
+        working-directory: backend
+        run: npx tsc --noEmit
+      
+      - name: Run unit tests with coverage
+        working-directory: backend
+        run: npm run test:coverage
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./backend/coverage/lcov.info
+          flags: backend
+          name: backend-coverage
+      
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          projectBaseDir: backend
+      
+      - name: Security audit
+        working-directory: backend
+        run: |
+          npm audit --audit-level=moderate
+          npx snyk test --severity-threshold=high || true
+
+  # Flutter Tests and Analysis
+  flutter-quality:
+    name: Flutter Quality Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+      
+      - name: Install dependencies
+        working-directory: flutter
+        run: flutter pub get
+      
+      - name: Run analyzer
+        working-directory: flutter
+        run: flutter analyze
+      
+      - name: Run tests with coverage
+        working-directory: flutter
+        run: flutter test --coverage
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./flutter/coverage/lcov.info
+          flags: flutter
+          name: flutter-coverage
+      
+      - name: Check formatting
+        working-directory: flutter
+        run: dart format --set-exit-if-changed .
+
+  # Build Backend
+  build-backend:
+    name: Build Backend
+    needs: backend-quality
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - name: Build backend
+        working-directory: backend
+        run: |
+          npm ci --production
+          npm run build
+      
+      - name: Create deployment package
+        working-directory: backend
+        run: |
+          zip -r ../backend-deployment.zip . \
+            -x "*.git*" \
+            -x "*test*" \
+            -x "*.md" \
+            -x "*.env.example"
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-deployment
+          path: backend-deployment.zip
+          retention-days: 7
+
+  # Build Flutter Apps
+  build-flutter:
+    name: Build Flutter Apps
+    needs: flutter-quality
+    runs-on: ${{ matrix.os }}
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: android
+            build-command: flutter build apk --release
+            artifact-path: build/app/outputs/flutter-apk/app-release.apk
+            artifact-name: android-release
+          
+          - os: macos-latest
+            platform: ios
+            build-command: flutter build ios --release --no-codesign
+            artifact-path: build/ios/iphoneos/Runner.app
+            artifact-name: ios-release
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+      
+      - name: Install dependencies
+        working-directory: flutter
+        run: flutter pub get
+      
+      - name: Build ${{ matrix.platform }}
+        working-directory: flutter
+        run: ${{ matrix.build-command }}
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: flutter/${{ matrix.artifact-path }}
+          retention-days: 7
+
+  # Deploy to Azure (Staging)
+  deploy-staging:
+    name: Deploy to Staging
+    needs: [build-backend, build-flutter]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download backend artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: backend-deployment
+      
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Deploy to Azure Functions (Staging)
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}-staging
+          package: backend-deployment.zip
+          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE_STAGING }}
+      
+      - name: Run smoke tests
+        run: |
+          sleep 30
+          curl -f https://${{ env.AZURE_FUNCTIONAPP_NAME }}-staging.azurewebsites.net/api/health || exit 1
+
+  # Deploy to Azure (Production)
+  deploy-production:
+    name: Deploy to Production
+    needs: [build-backend, build-flutter]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download backend artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: backend-deployment
+      
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Deploy to Azure Functions (Production)
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          package: backend-deployment.zip
+          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+      
+      - name: Run smoke tests
+        run: |
+          sleep 30
+          curl -f https://${{ env.AZURE_FUNCTIONAPP_NAME }}.azurewebsites.net/api/health || exit 1
+      
+      - name: Notify deployment
+        uses: 8398a7/action-slack@v3
+        if: always()
+        with:
+          status: ${{ job.status }}
+          text: 'Production deployment ${{ job.status }} for Quem Mente Menos'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+
+  # Release Management
+  create-release:
+    name: Create Release
+    needs: deploy-production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download Android APK
+        uses: actions/download-artifact@v3
+        with:
+          name: android-release
+          path: ./artifacts
+      
+      - name: Generate changelog
+        id: changelog
+        run: |
+          echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+          git log --pretty=format:"- %s" $(git describe --tags --abbrev=0)..HEAD >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.run_number }}
+          name: Release v${{ github.run_number }}
+          body: |
+            ## 🚀 Quem Mente Menos - Release v${{ github.run_number }}
+            
+            ### Changes
+            ${{ steps.changelog.outputs.CHANGELOG }}
+            
+            ### Artifacts
+            - Android APK attached below
+            - iOS build available in TestFlight
+          files: |
+            ./artifacts/*.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

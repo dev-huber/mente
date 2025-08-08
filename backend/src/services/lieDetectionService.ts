@@ -219,7 +219,8 @@ export class LieDetectionService {
      */
     async detectLies(request: LieDetectionRequest): Promise<LieDetectionResult> {
         const startTime = Date.now();
-        const requestLogger = createRequestLogger(request.requestId, {
+        const requestLogger = createRequestLogger({
+            requestId: request.requestId,
             functionName: 'detectLies',
             textLength: request.speechResult.recognizedText.length,
             segmentCount: request.speechResult.segments.length
@@ -368,7 +369,7 @@ export class LieDetectionService {
      */
     private async analyzeLinguisticPatterns(
         text: string,
-        segments: any[] | undefined // Mantido para futura análise
+        _segments: any[] | undefined // Mantido para futura análise
     ): Promise<LinguisticAnalysis> {
         const words = text.toLowerCase().split(/\s+/).filter(w => w.length > 0);
         const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);

@@ -107,12 +107,12 @@ export interface ProcessingOptions {
 export class AzureAIService {
     private subscriptionKey: string;
     private region: string;
-    private endpoint: string; // Mantido para futura integração
+    // private endpoint: string; // Removido temporariamente para evitar warning
 
     constructor() {
         this.subscriptionKey = process.env.AZURE_AI_SUBSCRIPTION_KEY || '';
         this.region = process.env.AZURE_AI_REGION || 'eastus';
-        this.endpoint = process.env.AZURE_AI_ENDPOINT || `https://${this.region}.api.cognitive.microsoft.com`;
+        // this.endpoint = process.env.AZURE_AI_ENDPOINT || `https://${this.region}.api.cognitive.microsoft.com`;
 
         this.validateConfiguration();
         
@@ -217,7 +217,7 @@ export class AzureAIService {
      * Speech recognition using Azure Speech Services
      */
     private async recognizeSpeech(
-        audioBuffer: Buffer,
+        _audioBuffer: Buffer,
         context: AIProcessingContext
     ): Promise<ServiceResult<SpeechRecognitionResult>> {
         logger.info('Starting speech recognition', {

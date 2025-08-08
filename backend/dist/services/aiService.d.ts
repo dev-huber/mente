@@ -87,7 +87,6 @@ export interface ProcessingOptions {
 export declare class AzureAIService {
     private subscriptionKey;
     private region;
-    private endpoint;
     constructor();
     /**
      * Comprehensive audio analysis pipeline

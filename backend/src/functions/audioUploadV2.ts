@@ -15,7 +15,8 @@ import { createRequestLogger } from '../utils/logger';
 export async function audioUpload(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
     // Generate unique request ID for tracking
     const requestId = context.invocationId;
-    const logger = createRequestLogger(requestId, { 
+        const logger = createRequestLogger({
+        requestId,
         functionName: 'audioUpload',
         method: request.method
     });
@@ -171,7 +172,7 @@ export async function audioUpload(request: HttpRequest, context: InvocationConte
  */
 export async function healthCheck(_request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
     const requestId = context.invocationId;
-    const logger = createRequestLogger(requestId, { functionName: 'healthCheck' });
+    const logger = createRequestLogger({ requestId, functionName: 'healthCheck' });
 
     try {
         logger.info('Health check requested');

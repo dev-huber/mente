@@ -10,10 +10,13 @@ const logger_1 = require("../utils/logger");
  * Azure AI Service for comprehensive audio analysis
  */
 class AzureAIService {
+    subscriptionKey;
+    region;
+    // private endpoint: string; // Removido temporariamente para evitar warning
     constructor() {
         this.subscriptionKey = process.env.AZURE_AI_SUBSCRIPTION_KEY || '';
         this.region = process.env.AZURE_AI_REGION || 'eastus';
-        this.endpoint = process.env.AZURE_AI_ENDPOINT || `https://${this.region}.api.cognitive.microsoft.com`;
+        // this.endpoint = process.env.AZURE_AI_ENDPOINT || `https://${this.region}.api.cognitive.microsoft.com`;
         this.validateConfiguration();
         logger_1.logger.info('Azure AI Service initialized', {
             region: this.region,
@@ -24,7 +27,6 @@ class AzureAIService {
      * Comprehensive audio analysis pipeline
      */
     async analyzeAudio(audioBuffer, context) {
-        var _a, _b;
         logger_1.logger.info('Starting comprehensive audio analysis', {
             audioId: context.audioId,
             audioSize: audioBuffer.length,
@@ -43,7 +45,7 @@ class AzureAIService {
                 speechRecognition: speechResult.data
             };
             // Step 2: Sentiment Analysis (if enabled)
-            if ((_a = context.processingOptions) === null || _a === void 0 ? void 0 : _a.enableSentimentAnalysis) {
+            if (context.processingOptions?.enableSentimentAnalysis) {
                 const sentimentResult = await this.analyzeSentiment(speechResult.data.recognizedText, context);
                 if (sentimentResult.success) {
                     results.sentimentAnalysis = sentimentResult.data;
@@ -56,7 +58,7 @@ class AzureAIService {
                 }
             }
             // Step 3: Lie Detection (if enabled)
-            if ((_b = context.processingOptions) === null || _b === void 0 ? void 0 : _b.enableLieDetection) {
+            if (context.processingOptions?.enableLieDetection) {
                 const lieDetectionResult = await this.detectLies(speechResult.data, results.sentimentAnalysis, context);
                 if (lieDetectionResult.success) {
                     results.lieDetection = lieDetectionResult.data;
@@ -93,7 +95,7 @@ class AzureAIService {
     /**
      * Speech recognition using Azure Speech Services
      */
-    async recognizeSpeech(audioBuffer, context) {
+    async recognizeSpeech(_audioBuffer, context) {
         logger_1.logger.info('Starting speech recognition', {
             audioId: context.audioId,
             language: context.language || 'pt-BR'
@@ -401,4 +403,3 @@ class AzureAIService {
 exports.AzureAIService = AzureAIService;
 // Export singleton instance
 exports.azureAIService = new AzureAIService();
-//# sourceMappingURL=aiService.js.map

@@ -18,7 +18,8 @@ const logger_1 = require("../utils/logger");
 async function audioUpload(request, context) {
     // Generate unique request ID for tracking
     const requestId = context.invocationId;
-    const logger = (0, logger_1.createRequestLogger)(requestId, {
+    const logger = (0, logger_1.createRequestLogger)({
+        requestId,
         functionName: 'audioUpload',
         method: request.method
     });
@@ -155,7 +156,7 @@ async function audioUpload(request, context) {
  */
 async function healthCheck(_request, context) {
     const requestId = context.invocationId;
-    const logger = (0, logger_1.createRequestLogger)(requestId, { functionName: 'healthCheck' });
+    const logger = (0, logger_1.createRequestLogger)({ requestId, functionName: 'healthCheck' });
     try {
         logger.info('Health check requested');
         // Basic health checks
@@ -217,4 +218,3 @@ functions_1.app.http('healthCheck', {
     route: 'health',
     handler: healthCheck
 });
-//# sourceMappingURL=audioUploadV2.js.map

@@ -1,220 +1,194 @@
 "use strict";
 /**
- * Shared logger utility for Azure Functions with defensive logging patterns
+ * Sistema de logging defensivo com Winston
+ * Implementa structured logging para debugging eficaz
  */
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Logger = exports.logger = void 0;
+exports.DefensiveLogger = exports.logger = void 0;
+exports.createLogger = createLogger;
 exports.createRequestLogger = createRequestLogger;
-/**
- * Structured logger with defensive error handling
- */
-class Logger {
-    constructor(defaultContext) {
-        this.context = {};
-        this.context = { ...defaultContext };
-    }
-    /**
-     * Set global context for all log entries
-     */
-    setContext(context) {
-        this.context = { ...this.context, ...context };
-    }
-    /**
-     * Log info message with context
-     */
-    info(message, additionalContext) {
-        this.log({
-            level: 'info',
-            message,
-            context: this.mergeContext(additionalContext)
+const winston_1 = __importDefault(require("winston"));
+const applicationinsights_1 = require("applicationinsights");
+const uuid_1 = require("uuid");
+// Configuração de níveis de log
+const logLevels = {
+    error: 0,
+    warn: 1,
+    info: 2,
+    http: 3,
+    debug: 4,
+    trace: 5,
+};
+// Formato customizado para logs estruturados
+const structuredFormat = winston_1.default.format.combine(winston_1.default.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss.SSS' }), winston_1.default.format.errors({ stack: true }), winston_1.default.format.json(), winston_1.default.format.printf(({ timestamp, level, message, ...meta }) => {
+    return JSON.stringify({
+        timestamp,
+        level,
+        message,
+        ...meta,
+    });
+}));
+// Configuração do logger
+class DefensiveLogger {
+    logger;
+    telemetryClient;
+    defaultContext = {};
+    constructor() {
+        this.logger = winston_1.default.createLogger({
+            levels: logLevels,
+            level: process.env.LOG_LEVEL || 'info',
+            format: structuredFormat,
+            defaultMeta: {
+                service: 'quem-mente-menos',
+                environment: process.env.NODE_ENV || 'development',
+                version: process.env.APP_VERSION || '1.0.0',
+            },
+            transports: this.getTransports(),
+            exceptionHandlers: [
+                new winston_1.default.transports.File({ filename: 'logs/exceptions.log' }),
+            ],
+            rejectionHandlers: [
+                new winston_1.default.transports.File({ filename: 'logs/rejections.log' }),
+            ],
         });
-    }
-    /**
-     * Log warning message with context
-     */
-    warn(message, additionalContext) {
-        this.log({
-            level: 'warn',
-            message,
-            context: this.mergeContext(additionalContext)
-        });
-    }
-    /**
-     * Log error message with context and error details
-     */
-    error(message, additionalContext) {
-        // Extract error information if present in context
-        let errorInfo;
-        if (additionalContext === null || additionalContext === void 0 ? void 0 : additionalContext.error) {
-            const error = additionalContext.error;
-            if (error instanceof Error) {
-                errorInfo = {
-                    message: error.message,
-                    stack: error.stack || undefined,
-                    name: error.name || undefined
-                };
-            }
-            else if (typeof error === 'string') {
-                errorInfo = {
-                    message: error
-                };
-            }
-            else if (typeof error === 'object') {
-                errorInfo = {
-                    message: String(error),
-                    stack: error.stack,
-                    name: error.name
-                };
-            }
+        // Configurar Application Insights se disponível
+        if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
+            this.telemetryClient = new applicationinsights_1.TelemetryClient(process.env.APPINSIGHTS_INSTRUMENTATIONKEY);
         }
-        this.log({
-            level: 'error',
-            message,
-            context: this.mergeContext(additionalContext),
-            error: errorInfo || undefined
-        });
     }
-    /**
-     * Log debug message with context (only in development)
-     */
-    debug(message, additionalContext) {
-        // Only log debug in development environment
+    getTransports() {
+        const transports = [];
+        // Console transport para desenvolvimento
         if (process.env.NODE_ENV !== 'production') {
-            this.log({
-                level: 'debug',
-                message,
-                context: this.mergeContext(additionalContext)
+            transports.push(new winston_1.default.transports.Console({
+                format: winston_1.default.format.combine(winston_1.default.format.colorize(), winston_1.default.format.simple()),
+            }));
+        }
+        // File transports para produção
+        transports.push(new winston_1.default.transports.File({
+            filename: 'logs/error.log',
+            level: 'error',
+            maxsize: 10485760, // 10MB
+            maxFiles: 5,
+        }), new winston_1.default.transports.File({
+            filename: 'logs/combined.log',
+            maxsize: 10485760, // 10MB
+            maxFiles: 10,
+        }));
+        return transports;
+    }
+    setDefaultContext(context) {
+        this.defaultContext = { ...this.defaultContext, ...context };
+    }
+    enrichContext(context) {
+        return {
+            ...this.defaultContext,
+            ...context,
+            requestId: context?.requestId || this.defaultContext.requestId || (0, uuid_1.v4)(),
+            timestamp: new Date().toISOString(),
+        };
+    }
+    sanitize(data) {
+        if (!data)
+            return data;
+        // Remove dados sensíveis
+        const sensitiveKeys = ['password', 'token', 'secret', 'apiKey', 'authorization'];
+        if (typeof data === 'object') {
+            const sanitized = { ...data };
+            for (const key in sanitized) {
+                if (sensitiveKeys.some(sensitive => key.toLowerCase().includes(sensitive))) {
+                    sanitized[key] = '[REDACTED]';
+                }
+                else if (typeof sanitized[key] === 'object') {
+                    sanitized[key] = this.sanitize(sanitized[key]);
+                }
+            }
+            return sanitized;
+        }
+        return data;
+    }
+    // Métodos de log principais
+    info(message, context) {
+        const enrichedContext = this.enrichContext(context);
+        this.logger.info(message, this.sanitize(enrichedContext));
+        if (this.telemetryClient) {
+            this.telemetryClient.trackEvent({
+                name: 'Info',
+                properties: { message, ...enrichedContext },
             });
         }
     }
-    /**
-     * Create a child logger with additional context
-     */
-    child(childContext) {
-        const childLogger = new Logger();
-        childLogger.setContext({ ...this.context, ...childContext });
-        return childLogger;
-    }
-    /**
-     * Internal log method that outputs structured logs
-     */
-    log(entry) {
-        var _a;
-        try {
-            // Add timestamp if not present
-            const enrichedEntry = {
-                ...entry,
-                context: {
-                    ...entry.context,
-                    timestamp: ((_a = entry.context) === null || _a === void 0 ? void 0 : _a.timestamp) || new Date().toISOString()
-                }
-            };
-            // Create console-friendly output with defensive formatting
-            const logOutput = this.formatLogEntry(enrichedEntry);
-            // Output to appropriate console method
-            switch (entry.level) {
-                case 'error':
-                    console.error(logOutput);
-                    break;
-                case 'warn':
-                    console.warn(logOutput);
-                    break;
-                case 'debug':
-                    console.debug(logOutput);
-                    break;
-                case 'info':
-                default:
-                    console.log(logOutput);
-                    break;
-            }
-            // In production, could also send to external logging service
-            if (process.env.NODE_ENV === 'production') {
-                this.sendToExternalLogger(enrichedEntry);
-            }
-        }
-        catch (error) {
-            // Fallback logging - never let logging itself crash the application
-            console.error('Logger error:', error);
-            console.error('Original message:', entry.message);
+    warn(message, context) {
+        const enrichedContext = this.enrichContext(context);
+        this.logger.warn(message, this.sanitize(enrichedContext));
+        if (this.telemetryClient) {
+            this.telemetryClient.trackEvent({
+                name: 'Warning',
+                properties: { message, ...enrichedContext },
+            });
         }
     }
-    /**
-     * Merge additional context with global context
-     */
-    mergeContext(additionalContext) {
-        return {
-            ...this.context,
-            ...additionalContext
-        };
-    }
-    /**
-     * Format log entry for console output
-     */
-    formatLogEntry(entry) {
-        var _a;
-        try {
-            const parts = [];
-            // Timestamp
-            if ((_a = entry.context) === null || _a === void 0 ? void 0 : _a.timestamp) {
-                parts.push(`[${entry.context.timestamp}]`);
-            }
-            // Level
-            parts.push(`${entry.level.toUpperCase()}:`);
-            // Message
-            parts.push(entry.message);
-            // Context (excluding timestamp and error)
-            if (entry.context) {
-                const contextCopy = { ...entry.context };
-                delete contextCopy.timestamp;
-                delete contextCopy.error;
-                if (Object.keys(contextCopy).length > 0) {
-                    parts.push(`| Context: ${JSON.stringify(contextCopy)}`);
-                }
-            }
-            // Error details
-            if (entry.error) {
-                parts.push(`| Error: ${entry.error.message}`);
-                if (entry.error.stack && process.env.NODE_ENV !== 'production') {
-                    parts.push(`| Stack: ${entry.error.stack}`);
-                }
-            }
-            return parts.join(' ');
-        }
-        catch (error) {
-            // Fallback to simple string representation
-            return `${entry.level.toUpperCase()}: ${entry.message} [Formatting Error]`;
+    error(message, error, context) {
+        const enrichedContext = this.enrichContext(context);
+        const errorObject = error instanceof Error ? {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+        } : { error };
+        this.logger.error(message, {
+            ...this.sanitize(enrichedContext),
+            error: errorObject,
+        });
+        if (this.telemetryClient) {
+            this.telemetryClient.trackException({
+                exception: error instanceof Error ? error : new Error(String(error)),
+                properties: { message, ...enrichedContext },
+            });
         }
     }
-    /**
-     * Send logs to external logging service (placeholder for production)
-     */
-    sendToExternalLogger(_entry) {
-        // Placeholder for external logging integration
-        // Could send to Azure Application Insights, LogDNA, Datadog, etc.
-        var _a;
-        // For now, just ensure it doesn't crash
-        try {
-            if (typeof process !== 'undefined' && ((_a = process.env) === null || _a === void 0 ? void 0 : _a.APPINSIGHTS_INSTRUMENTATIONKEY)) {
-                // Would integrate with Application Insights here
-            }
-        }
-        catch (error) {
-            // Silently handle external logging errors
-            console.error('External logging failed:', error);
+    debug(message, context) {
+        if (process.env.NODE_ENV === 'production')
+            return;
+        const enrichedContext = this.enrichContext(context);
+        this.logger.debug(message, this.sanitize(enrichedContext));
+    }
+    trace(message, context) {
+        if (process.env.NODE_ENV === 'production')
+            return;
+        const enrichedContext = this.enrichContext(context);
+        this.logger.log('trace', message, this.sanitize(enrichedContext));
+    }
+    // Método para medir performance
+    startTimer() {
+        const start = Date.now();
+        return () => Date.now() - start;
+    }
+    // Log de métricas
+    metric(name, value, context) {
+        const enrichedContext = this.enrichContext(context);
+        this.logger.info(`Metric: ${name}`, {
+            ...enrichedContext,
+            metric: { name, value },
+        });
+        if (this.telemetryClient) {
+            this.telemetryClient.trackMetric({
+                name,
+                value,
+                properties: enrichedContext,
+            });
         }
     }
 }
-exports.Logger = Logger;
-// Create and export default logger instance
-exports.logger = new Logger({
-    functionName: process.env.FUNCTION_NAME || 'unknown',
-    requestId: process.env.INVOCATION_ID || 'unknown'
-});
-// Helper function for creating request-scoped loggers
-function createRequestLogger(requestId, additionalContext) {
-    return exports.logger.child({
-        requestId,
-        ...additionalContext
-    });
+exports.DefensiveLogger = DefensiveLogger;
+// Singleton instance
+exports.logger = new DefensiveLogger();
+// Funções adicionais para compatibilidade
+function createLogger(context) {
+    return exports.logger;
 }
-//# sourceMappingURL=logger.js.map
+function createRequestLogger(requestId) {
+    return exports.logger;
+}

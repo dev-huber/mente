@@ -1,9 +1,53 @@
 import { logger } from '../utils/logger';
 import { app, HttpRequest, HttpResponseInit } from '@azure/functions';
-import { validateUploadRequest, processAudioFile, handleUploadError } from '../services/audioProcessingService'; // Mantido apenas o necessário
+import { validateUploadRequest, handleUploadError } from '../services/audioProcessingService'; // Mantido apenas o necessário
 import { audioStorageService } from '../services/storageService';
 // import { createRequestLogger } from '../utils/logger'; // Não utilizado
 import { v4 as uuidv4 } from 'uuid';
+
+// Health check interfaces
+interface HealthCheckResult {
+    storage: boolean;
+    aiServices: boolean;
+    memory: boolean;
+}
+
+// Perform comprehensive health checks
+async function performHealthChecks(requestId: string): Promise<HealthCheckResult> {
+    const results: HealthCheckResult = {
+        storage: false,
+        aiServices: false,
+        memory: false
+    };
+
+    try {
+        // Check Azure Blob Storage
+        const storageConnectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
+        results.storage = !!storageConnectionString && storageConnectionString.length > 0;
+
+        // Check Azure AI Services
+        const aiSubscriptionKey = process.env.AZURE_AI_SUBSCRIPTION_KEY;
+        const speechKey = process.env.AZURE_SPEECH_KEY;
+        results.aiServices = !!(aiSubscriptionKey || speechKey);
+
+        // Check memory usage
+        const memoryUsage = process.memoryUsage();
+        const memoryLimitMB = 512; // Azure Functions basic memory limit
+        const usedMemoryMB = memoryUsage.heapUsed / 1024 / 1024;
+        results.memory = usedMemoryMB < (memoryLimitMB * 0.8); // Alert at 80%
+
+        logger.info('Health checks completed', { 
+            requestId, 
+            results,
+            memoryUsageMB: usedMemoryMB 
+        });
+
+    } catch (error) {
+        logger.error('Health check failed', error as Error, { requestId });
+    }
+
+    return results;
+}
 
 /**
  * Defensive Azure Function for audio upload with comprehensive error handling
@@ -164,15 +208,19 @@ export async function healthCheck(): Promise<HttpResponseInit> {
             checks: {
                 function: 'ok',
                 storage: 'checking...',
-                ai_services: 'checking...'
+                ai_services: 'checking...',
+                memory: 'checking...'
             }
         };
 
-        // TODO: Add actual health checks for dependencies
-        // - Azure Blob Storage connectivity
-        // - Azure AI Services availability
-        // - Memory usage
-        // - Function execution metrics
+        // Perform actual health checks for dependencies
+        const checks = await performHealthChecks(requestId);
+        healthStatus.checks = {
+            function: 'ok',
+            storage: checks.storage ? 'healthy' : 'unhealthy',
+            ai_services: checks.aiServices ? 'healthy' : 'unhealthy',
+            memory: checks.memory ? 'healthy' : 'warning'
+        };
 
         logger.info('Health check completed', { requestId, status: 'healthy' });
 

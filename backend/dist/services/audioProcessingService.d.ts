@@ -1,39 +1,38 @@
-import { HttpRequest } from '@azure/functions';
-import { Buffer } from 'buffer';
-export interface FileData {
-    buffer: Buffer;
-    originalName: string;
-    mimeType: string;
-    metadata?: Record<string, any> | undefined;
-}
-export interface ProcessingContext {
-    fileId: string;
-    fileName: string;
-    requestId: string;
-    context: Record<string, any>;
-}
-export interface ServiceResult<T> {
-    success: boolean;
-    data?: T;
-    error?: string | undefined;
-}
-export interface ProcessedAudioData {
-    processedBuffer: Buffer;
-    audioDuration: number;
+/**
+ * Serviço de Processamento de Áudio Simplificado
+ * Mock implementation para desenvolvimento
+ */
+export interface AudioAnalysisResult {
+    duration: number;
+    format: string;
     sampleRate: number;
     channels: number;
-    format: string;
+    bitrate: number;
+    size: number;
+    quality: 'excellent' | 'good' | 'fair' | 'poor';
 }
-/**
- * Validate upload request with comprehensive checks
- */
-export declare function validateUploadRequest(request: HttpRequest): Promise<ServiceResult<FileData>>;
-/**
- * Process audio file with validation and basic analysis
- */
-export declare function processAudioFile(fileData: FileData, context: ProcessingContext): Promise<ServiceResult<ProcessedAudioData>>;
-/**
- * Handle upload errors with structured logging
- */
-export declare function handleUploadError(error: unknown, context: Record<string, any>): any;
+export interface ProcessingContext {
+    audioId: string;
+    userId: string;
+}
+export declare class AudioProcessingService {
+    constructor();
+    analyzeAudio(audioBuffer: Buffer): Promise<AudioAnalysisResult>;
+    normalizeAudio(audioBuffer: Buffer): Promise<Buffer>;
+    extractFeatures(audioBuffer: Buffer): Promise<any>;
+    validateUploadRequest(request: any): Promise<{
+        valid: boolean;
+        error?: string;
+    }>;
+    processAudioFile(file: any, context: ProcessingContext): Promise<any>;
+    handleUploadError(error: Error): any;
+    private determineQuality;
+}
+export declare const audioProcessingService: AudioProcessingService;
+export declare function validateUploadRequest(request: any): Promise<{
+    valid: boolean;
+    error?: string;
+}>;
+export declare function processAudioFile(file: any, context: ProcessingContext): Promise<any>;
+export declare function handleUploadError(error: Error): any;
 //# sourceMappingURL=audioProcessingService.d.ts.map

@@ -1,193 +1,223 @@
 "use strict";
 /**
- * Sistema de autenticação JWT completo e defensivo
- * - Validação rigorosa de inputs
- * - Error handling abrangente
- * - Rate limiting
- * - Refresh token rotation
- * - Logging de segurança
- * - Testes unitários inclusos
- * - Documentação de cenários de erro
+ * Serviço de Autenticação JWT para "Quem Mente Menos?"
+ * Implementa autenticação segura com refresh tokens
  */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defaultAuthConfig = exports.JwtAuthService = void 0;
-exports.logSecurityEvent = logSecurityEvent;
+exports.jwtAuthService = exports.JWTAuthService = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const joi_1 = __importDefault(require("joi"));
-const crypto_1 = __importDefault(require("crypto"));
-// Validação de payloads
-const payloadSchema = joi_1.default.object({
-    userId: joi_1.default.string().min(3).max(64).required(),
-    roles: joi_1.default.array().items(joi_1.default.string()).min(1).required(),
-    issuedAt: joi_1.default.number().required(),
-    refreshId: joi_1.default.string().optional()
-}).unknown(true); // Permite campos extras do JWT
-// Rate limiting simples (in-memory, para demo)
-const rateLimitMap = new Map();
-class JwtAuthService {
-    constructor(config) {
-        this.config = config;
-    }
-    /**
-     * Gera par de tokens JWT (access + refresh) com validação e logging
-     */
-    generateTokenPair(payload) {
-        // Fail Fast: validação de payload
-        const { error } = payloadSchema.validate(payload);
-        if (error) {
-            return { success: false, error: `Payload inválido: ${error.message}` };
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const uuid_1 = require("uuid");
+const logger_1 = require("@/utils/logger");
+const CustomErrors_1 = require("@/core/errors/CustomErrors");
+class JWTAuthService {
+    accessTokenSecret;
+    refreshTokenSecret;
+    accessTokenExpiry = '15m';
+    refreshTokenExpiry = '30d';
+    saltRounds = 12;
+    blacklistedTokens = new Set(); // TODO: Usar Redis em produção
+    constructor() {
+        // Validação de configuração
+        this.accessTokenSecret = process.env.JWT_SECRET || '';
+        this.refreshTokenSecret = process.env.JWT_REFRESH_SECRET || '';
+        if (!this.accessTokenSecret || !this.refreshTokenSecret) {
+            throw new Error('JWT secrets não configurados');
         }
-        // Rate limiting defensivo
-        if (!this.checkRateLimit(payload.userId)) {
-            return { success: false, error: 'Rate limit excedido' };
-        }
-        // Geração de refreshId único
-        const refreshId = crypto_1.default.randomBytes(32).toString('hex');
-        const now = Math.floor(Date.now() / 1000);
-        const accessPayload = { ...payload, issuedAt: now };
-        const refreshPayload = { userId: payload.userId, refreshId, issuedAt: now, roles: payload.roles };
-        try {
-            const accessToken = jsonwebtoken_1.default.sign(accessPayload, this.config.secret, {
-                expiresIn: this.config.expiresIn,
-                algorithm: 'HS256'
-            });
-            const refreshToken = jsonwebtoken_1.default.sign(refreshPayload, this.config.secret, {
-                expiresIn: this.config.refreshExpiresIn,
-                algorithm: 'HS256'
-            });
-            // Logging de segurança
-            logSecurityEvent('token_generated', {
-                userId: payload.userId,
-                roles: payload.roles,
-                issuedAt: accessPayload.issuedAt
-            });
-            return { success: true, data: { accessToken, refreshToken } };
-        }
-        catch (err) {
-            return { success: false, error: `Erro ao gerar token: ${err.message}` };
+        // Validar complexidade dos secrets
+        if (this.accessTokenSecret.length < 32 || this.refreshTokenSecret.length < 32) {
+            throw new Error('JWT secrets muito fracos (mínimo 32 caracteres)');
         }
     }
-    /**
-     * Valida token JWT e retorna payload seguro
-     */
-    validateToken(token) {
-        if (!token || typeof token !== 'string') {
-            return { success: false, error: 'Token ausente ou malformado' };
-        }
+    async generateTokens(userId, email, role = 'user') {
         try {
-            const decoded = jsonwebtoken_1.default.verify(token, this.config.secret);
-            // Validação de estrutura
-            const { error } = payloadSchema.validate(decoded);
-            if (error) {
-                return { success: false, error: `Payload inválido: ${error.message}` };
-            }
-            return { success: true, data: decoded };
-        }
-        catch (err) {
-            return { success: false, error: `Token inválido: ${err.message}` };
-        }
-    }
-    /**
-     * Gera novo par de tokens a partir de refresh token válido
-     */
-    rotateRefreshToken(refreshToken) {
-        if (!refreshToken || typeof refreshToken !== 'string') {
-            return { success: false, error: 'Refresh token ausente ou malformado' };
-        }
-        try {
-            const decoded = jsonwebtoken_1.default.verify(refreshToken, this.config.secret);
-            if (!decoded.userId || !decoded.refreshId) {
-                return { success: false, error: 'Refresh token inválido' };
-            }
-            // Gera novo par de tokens
+            const jti = (0, uuid_1.v4)();
+            const now = Math.floor(Date.now() / 1000);
+            // Payload do token
             const payload = {
-                userId: decoded.userId,
-                roles: decoded.roles || [],
-                issuedAt: Math.floor(Date.now() / 1000)
+                sub: userId,
+                email,
+                role,
+                iat: now,
+                jti,
             };
-            return this.generateTokenPair(payload);
+            // Gerar access token
+            const accessToken = jsonwebtoken_1.default.sign(payload, this.accessTokenSecret, {
+                expiresIn: this.accessTokenExpiry,
+                algorithm: 'HS256',
+            });
+            // Gerar refresh token
+            const refreshToken = jsonwebtoken_1.default.sign({ ...payload, type: 'refresh' }, this.refreshTokenSecret, {
+                expiresIn: this.refreshTokenExpiry,
+                algorithm: 'HS256',
+            });
+            logger_1.logger.info('Tokens gerados com sucesso', {
+                operation: 'generateTokens',
+                service: 'JWTAuthService',
+                userId,
+                metadata: { jti, role },
+            });
+            return {
+                accessToken,
+                refreshToken,
+                expiresIn: 15 * 60, // 15 minutos em segundos
+            };
         }
-        catch (err) {
-            return { success: false, error: `Refresh token inválido: ${err.message}` };
+        catch (error) {
+            logger_1.logger.error('Falha ao gerar tokens', error, {
+                operation: 'generateTokens',
+                service: 'JWTAuthService',
+                userId,
+            });
+            throw new CustomErrors_1.AuthenticationError('Falha ao gerar tokens de autenticação');
         }
     }
-    /**
-     * Rate limiting defensivo por usuário
-     */
-    checkRateLimit(userId) {
-        const now = Date.now();
-        const entry = rateLimitMap.get(userId) || { count: 0, lastRequest: 0 };
-        if (now - entry.lastRequest > 60000) {
-            // Reset a cada minuto
-            rateLimitMap.set(userId, { count: 1, lastRequest: now });
-            return true;
+    async validateAccessToken(token) {
+        try {
+            // Verificar se token está na blacklist
+            if (this.blacklistedTokens.has(token)) {
+                throw new CustomErrors_1.AuthenticationError('Token revogado');
+            }
+            // Validar e decodificar token
+            const payload = jsonwebtoken_1.default.verify(token, this.accessTokenSecret, {
+                algorithms: ['HS256'],
+            });
+            // Validações adicionais
+            if (!payload.sub || !payload.email || !payload.jti) {
+                throw new CustomErrors_1.AuthenticationError('Token inválido');
+            }
+            // Verificar se token está na blacklist (usando jti)
+            if (this.blacklistedTokens.has(payload.jti)) {
+                throw new CustomErrors_1.AuthenticationError('Token revogado');
+            }
+            return payload;
         }
-        if (entry.count >= this.config.rateLimit) {
+        catch (error) {
+            if (error instanceof jsonwebtoken_1.default.TokenExpiredError) {
+                throw new CustomErrors_1.AuthenticationError('Token expirado');
+            }
+            if (error instanceof jsonwebtoken_1.default.JsonWebTokenError) {
+                throw new CustomErrors_1.AuthenticationError('Token inválido');
+            }
+            if (error instanceof CustomErrors_1.AuthenticationError) {
+                throw error;
+            }
+            logger_1.logger.error('Erro ao validar token', error, {
+                operation: 'validateAccessToken',
+                service: 'JWTAuthService',
+            });
+            throw new CustomErrors_1.AuthenticationError('Falha na validação do token');
+        }
+    }
+    async refreshTokens(refreshToken) {
+        try {
+            // Validar refresh token
+            const payload = jsonwebtoken_1.default.verify(refreshToken, this.refreshTokenSecret, {
+                algorithms: ['HS256'],
+            });
+            if (payload.type !== 'refresh') {
+                throw new CustomErrors_1.AuthenticationError('Token inválido para refresh');
+            }
+            // Verificar blacklist
+            if (this.blacklistedTokens.has(payload.jti)) {
+                throw new CustomErrors_1.AuthenticationError('Refresh token revogado');
+            }
+            // Invalidar tokens antigos
+            this.blacklistedTokens.add(payload.jti);
+            // Gerar novos tokens
+            return this.generateTokens(payload.sub, payload.email, payload.role);
+        }
+        catch (error) {
+            if (error instanceof jsonwebtoken_1.default.TokenExpiredError) {
+                throw new CustomErrors_1.AuthenticationError('Refresh token expirado');
+            }
+            if (error instanceof CustomErrors_1.AuthenticationError) {
+                throw error;
+            }
+            logger_1.logger.error('Erro ao renovar tokens', error, {
+                operation: 'refreshTokens',
+                service: 'JWTAuthService',
+            });
+            throw new CustomErrors_1.AuthenticationError('Falha ao renovar tokens');
+        }
+    }
+    async hashPassword(password) {
+        try {
+            // Validar força da senha
+            this.validatePasswordStrength(password);
+            // Gerar salt e hash
+            const salt = await bcrypt_1.default.genSalt(this.saltRounds);
+            const hash = await bcrypt_1.default.hash(password, salt);
+            return { hash, salt };
+        }
+        catch (error) {
+            logger_1.logger.error('Erro ao hashear senha', error, {
+                operation: 'hashPassword',
+                service: 'JWTAuthService',
+            });
+            throw new Error('Falha ao processar senha');
+        }
+    }
+    async verifyPassword(password, hash) {
+        try {
+            return await bcrypt_1.default.compare(password, hash);
+        }
+        catch (error) {
+            logger_1.logger.error('Erro ao verificar senha', error, {
+                operation: 'verifyPassword',
+                service: 'JWTAuthService',
+            });
             return false;
         }
-        rateLimitMap.set(userId, { count: entry.count + 1, lastRequest: now });
-        return true;
+    }
+    revokeToken(token) {
+        try {
+            const payload = jsonwebtoken_1.default.decode(token);
+            if (payload?.jti) {
+                this.blacklistedTokens.add(payload.jti);
+                logger_1.logger.info('Token revogado', {
+                    operation: 'revokeToken',
+                    service: 'JWTAuthService',
+                    metadata: { jti: payload.jti },
+                });
+            }
+        }
+        catch (error) {
+            logger_1.logger.error('Erro ao revogar token', error, {
+                operation: 'revokeToken',
+                service: 'JWTAuthService',
+            });
+        }
+    }
+    validatePasswordStrength(password) {
+        const minLength = 8;
+        const hasUpperCase = /[A-Z]/.test(password);
+        const hasLowerCase = /[a-z]/.test(password);
+        const hasNumbers = /\d/.test(password);
+        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+        if (password.length < minLength) {
+            throw new Error(`Senha deve ter no mínimo ${minLength} caracteres`);
+        }
+        if (!hasUpperCase || !hasLowerCase) {
+            throw new Error('Senha deve conter letras maiúsculas e minúsculas');
+        }
+        if (!hasNumbers) {
+            throw new Error('Senha deve conter números');
+        }
+        if (!hasSpecialChar) {
+            throw new Error('Senha deve conter caracteres especiais');
+        }
+    }
+    extractTokenFromHeader(authHeader) {
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return null;
+        }
+        return authHeader.substring(7);
     }
 }
-exports.JwtAuthService = JwtAuthService;
-// Configuração padrão para testes/demonstrativo
-exports.defaultAuthConfig = {
-    secret: 'supersecretkey123',
-    expiresIn: '15m',
-    refreshExpiresIn: '7d',
-    rateLimit: 10
-};
-// Logging estruturado de segurança
-function logSecurityEvent(event, details) {
-    console.log(JSON.stringify({
-        level: 'security',
-        timestamp: new Date().toISOString(),
-        event,
-        details
-    }));
-}
-/**
- * Testes unitários para o sistema JWT
- */
-if (require.main === module) {
-    const service = new JwtAuthService(exports.defaultAuthConfig);
-    const payload = {
-        userId: 'user123',
-        roles: ['admin'],
-        issuedAt: Math.floor(Date.now() / 1000)
-    };
-    // Teste: geração de token
-    const genResult = service.generateTokenPair(payload);
-    console.log('Teste geração:', genResult);
-    // Teste: validação de token
-    if (genResult.success) {
-        const valResult = service.validateToken(genResult.data.accessToken);
-        console.log('Teste validação:', valResult);
-    }
-    // Teste: rotação de refresh token
-    if (genResult.success) {
-        const rotResult = service.rotateRefreshToken(genResult.data.refreshToken);
-        console.log('Teste rotação:', rotResult);
-    }
-    // Teste: rate limiting
-    for (let i = 0; i < 12; i++) {
-        const rateResult = service.generateTokenPair(payload);
-        console.log(`Rate limiting [${i + 1}]:`, rateResult.success ? 'OK' : rateResult.error);
-    }
-    // Teste: token malformado
-    const malResult = service.validateToken('invalid.token');
-    console.log('Teste token malformado:', malResult);
-}
-/**
- * Documentação de cenários de erro:
- * - Payload inválido: retorna erro detalhado
- * - Token malformado: retorna erro
- * - Rate limit excedido: bloqueia geração
- * - Refresh token inválido: retorna erro
- * - Falha de assinatura: retorna erro
- * - Logging de todos eventos críticos
- */
-//# sourceMappingURL=jwtAuthService.js.map
+exports.JWTAuthService = JWTAuthService;
+// Singleton export
+exports.jwtAuthService = new JWTAuthService();

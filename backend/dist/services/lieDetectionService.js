@@ -10,34 +10,34 @@ const logger_1 = require("../utils/logger");
  * Advanced Lie Detection Service
  */
 class LieDetectionService {
+    defaultThresholds = {
+        lowRisk: 0.3,
+        mediumRisk: 0.7,
+        highRisk: 1.0
+    };
+    linguisticPatterns = {
+        hesitationMarkers: [
+            'uh', 'um', 'eh', 'hmm', 'er', 'ah',
+            'bem', 'né', 'então', 'tipo', 'assim'
+        ],
+        fillerWords: [
+            'tipo', 'sabe', 'então', 'assim', 'meio que', 'digamos',
+            'de certa forma', 'por assim dizer', 'na verdade'
+        ],
+        strongAssertions: [
+            'certamente', 'definitivamente', 'absolutamente', 'obviamente',
+            'sem dúvida', 'com certeza', 'claramente', 'evidentemente'
+        ],
+        qualifiers: [
+            'talvez', 'provavelmente', 'possivelmente', 'aparentemente',
+            'parece', 'acho que', 'acredito que', 'suponho'
+        ],
+        hedging: [
+            'meio que', 'mais ou menos', 'de certa forma', 'por assim dizer',
+            'algo como', 'uma espécie de', 'praticamente'
+        ]
+    };
     constructor() {
-        this.defaultThresholds = {
-            lowRisk: 0.3,
-            mediumRisk: 0.7,
-            highRisk: 1.0
-        };
-        this.linguisticPatterns = {
-            hesitationMarkers: [
-                'uh', 'um', 'eh', 'hmm', 'er', 'ah',
-                'bem', 'né', 'então', 'tipo', 'assim'
-            ],
-            fillerWords: [
-                'tipo', 'sabe', 'então', 'assim', 'meio que', 'digamos',
-                'de certa forma', 'por assim dizer', 'na verdade'
-            ],
-            strongAssertions: [
-                'certamente', 'definitivamente', 'absolutamente', 'obviamente',
-                'sem dúvida', 'com certeza', 'claramente', 'evidentemente'
-            ],
-            qualifiers: [
-                'talvez', 'provavelmente', 'possivelmente', 'aparentemente',
-                'parece', 'acho que', 'acredito que', 'suponho'
-            ],
-            hedging: [
-                'meio que', 'mais ou menos', 'de certa forma', 'por assim dizer',
-                'algo como', 'uma espécie de', 'praticamente'
-            ]
-        };
         logger_1.logger.info('Lie Detection Service initialized', {
             linguisticPatternsLoaded: Object.keys(this.linguisticPatterns).length,
             defaultThresholds: this.defaultThresholds
@@ -47,9 +47,9 @@ class LieDetectionService {
      * Perform comprehensive lie detection analysis
      */
     async detectLies(request) {
-        var _a;
         const startTime = Date.now();
-        const requestLogger = (0, logger_1.createRequestLogger)(request.requestId, {
+        const requestLogger = (0, logger_1.createRequestLogger)({
+            requestId: request.requestId,
             functionName: 'detectLies',
             textLength: request.speechResult.recognizedText.length,
             segmentCount: request.speechResult.segments.length
@@ -111,7 +111,7 @@ class LieDetectionService {
                 overallAssessment
             });
             const recommendations = this.generateRecommendations(overallLieScore, indicators);
-            const riskLevel = this.determineRiskLevel(overallLieScore, (_a = request.analysisOptions) === null || _a === void 0 ? void 0 : _a.customThresholds);
+            const riskLevel = this.determineRiskLevel(overallLieScore, request.analysisOptions?.customThresholds);
             const confidence = this.calculateConfidence(request.speechResult, indicators);
             const processingTime = Date.now() - startTime;
             requestLogger.info('Lie detection analysis completed', {
@@ -162,7 +162,7 @@ class LieDetectionService {
     /**
      * Analyze linguistic patterns for deception indicators
      */
-    async analyzeLinguisticPatterns(text, segments // Mantido para futura análise
+    async analyzeLinguisticPatterns(text, _segments // Mantido para futura análise
     ) {
         const words = text.toLowerCase().split(/\s+/).filter(w => w.length > 0);
         const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
@@ -701,4 +701,3 @@ class LieDetectionService {
 exports.LieDetectionService = LieDetectionService;
 // Export singleton instance
 exports.lieDetectionService = new LieDetectionService();
-//# sourceMappingURL=lieDetectionService.js.map

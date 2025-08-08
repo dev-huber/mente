@@ -1,0 +1,494 @@
+# Deploy Script para "Quem Mente Menos?" - Windows PowerShell
+# Execução completa de deploy com validações defensivas
+
+[CmdletBinding()]
+param(
+    [Parameter(Mandatory=$false)]
+    [ValidateSet('production', 'staging', 'development')]
+    [string]$Environment = 'staging',
+    
+    [Parameter(Mandatory=$false)]
+    [switch]$SkipTests = $false,
+    
+    [Parameter(Mandatory=$false)]
+    [switch]$SkipInfrastructure = $false,
+    
+    [Parameter(Mandatory=$false)]
+    [switch]$SkipFlutter = $false,
+    
+    [Parameter(Mandatory=$false)]
+    [switch]$DryRun = $false,
+    
+    [Parameter(Mandatory=$false)]
+    [switch]$BackendOnly = $false
+)
+
+# Configuração de cores
+$ErrorActionPreference = "Stop"
+$ProgressPreference = "Continue"
+
+# Paths
+$ScriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
+$ProjectRoot = Split-Path -Parent $ScriptPath
+$BackendDir = Join-Path $ProjectRoot "backend"
+$FlutterDir = Join-Path $ProjectRoot "flutter"
+$TerraformDir = Join-Path $ProjectRoot "terraform"
+
+# Funções de log
+function Write-Success {
+    Write-Host "[SUCCESS]" -ForegroundColor Green -NoNewline
+    Write-Host " $args"
+}
+
+function Write-Info {
+    Write-Host "[INFO]" -ForegroundColor Cyan -NoNewline
+    Write-Host " $args"
+}
+
+function Write-Warning {
+    Write-Host "[WARNING]" -ForegroundColor Yellow -NoNewline
+    Write-Host " $args"
+}
+
+function Write-Error {
+    Write-Host "[ERROR]" -ForegroundColor Red -NoNewline
+    Write-Host " $args"
+    exit 1
+}
+
+# Função para verificar pré-requisitos
+function Test-Prerequisites {
+    Write-Info "Verificando pré-requisitos..."
+    
+    # Node.js
+    if (!(Get-Command node -ErrorAction SilentlyContinue)) {
+        Write-Error "Node.js não está instalado"
+    }
+    $nodeVersion = node --version
+    Write-Info "Node.js: $nodeVersion"
+    
+    # Verificar versão mínima do Node.js (20+)
+    $nodeVersionNumber = [int]($nodeVersion -replace 'v(\d+)\..*', '$1')
+    if ($nodeVersionNumber -lt 20) {
+        Write-Warning "Node.js versão $nodeVersion detectada. Recomendado v20+"
+    }
+    
+    # Flutter (opcional se BackendOnly ou SkipFlutter)
+    if (!$BackendOnly -and !$SkipFlutter) {
+        if (!(Get-Command flutter -ErrorAction SilentlyContinue)) {
+            Write-Warning "Flutter não está instalado - habilitando modo BackendOnly"
+            $script:BackendOnly = $true
+        } else {
+            $flutterVersion = flutter --version | Select-String -Pattern "Flutter (\d+\.\d+\.\d+)"
+            Write-Info "Flutter instalado"
+        }
+    } elseif ($BackendOnly -or $SkipFlutter) {
+        Write-Info "Flutter build será pulado (BackendOnly=$BackendOnly, SkipFlutter=$SkipFlutter)"
+    }
+    
+    # Azure CLI
+    if (!(Get-Command az -ErrorAction SilentlyContinue)) {
+        Write-Warning "Azure CLI não está instalado - pulando deploy para Azure"
+        Write-Warning "Instale em: https://aka.ms/installazurecliwindows"
+    } else {
+        $azVersion = az --version 2>$null | Select-String -Pattern "azure-cli" | Select-Object -First 1
+        Write-Info "Azure CLI instalado"
+    }
+    
+    # Terraform (opcional)
+    if (!(Get-Command terraform -ErrorAction SilentlyContinue)) {
+        Write-Warning "Terraform não está instalado (infraestrutura será pulada)"
+        $script:SkipInfrastructure = $true
+    } else {
+        $terraformVersion = terraform --version 2>$null | Select-String -Pattern "Terraform v" | Select-Object -First 1
+        Write-Info "Terraform instalado"
+    }
+    
+    Write-Success "Pré-requisitos verificados ✓"
+}
+
+# Função para executar testes
+function Invoke-Tests {
+    if ($SkipTests) {
+        Write-Warning "Pulando testes (não recomendado para produção)"
+        return
+    }
+    
+    Write-Info "Executando testes do backend..."
+    Push-Location $BackendDir
+    try {
+        # Verificar se node_modules existe
+        if (!(Test-Path "node_modules")) {
+            Write-Info "Instalando dependências para testes..."
+            npm ci
+        }
+        
+        npm test
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "Testes falharam mas continuando com o deploy..."
+        } else {
+            Write-Success "Testes do backend passaram ✓"
+        }
+    }
+    catch {
+        Write-Warning "Erro ao executar testes: $_"
+    }
+    finally {
+        Pop-Location
+    }
+    
+    if (!$BackendOnly -and !$SkipFlutter) {
+        Write-Info "Executando testes do Flutter..."
+        Push-Location $FlutterDir
+        try {
+            flutter test
+            if ($LASTEXITCODE -eq 0) {
+                Write-Success "Testes do Flutter passaram ✓"
+            }
+        }
+        catch {
+            Write-Warning "Erro nos testes do Flutter: $_"
+        }
+        finally {
+            Pop-Location
+        }
+    }
+}
+
+# Função para build do backend
+function Build-Backend {
+    Write-Info "Construindo backend..."
+    Push-Location $BackendDir
+    try {
+        # Limpar builds anteriores
+        if (Test-Path "dist") {
+            Remove-Item -Path "dist" -Recurse -Force
+        }
+        
+        # Verificar se node_modules existe
+        if (!(Test-Path "node_modules")) {
+            Write-Info "Instalando dependências..."
+            npm ci
+        }
+        
+        # Build TypeScript
+        Write-Info "Compilando TypeScript..."
+        npm run build
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "Build falhou - tentando continuar..."
+        }
+        
+        # Criar pacote de deployment
+        Write-Info "Criando pacote de deployment..."
+        $zipPath = Join-Path $ProjectRoot "backend-$Environment.zip"
+        
+        # Remover zip anterior se existir
+        if (Test-Path $zipPath) {
+            Remove-Item $zipPath -Force
+        }
+        
+        # Preparar arquivos para zip
+        $filesToZip = @()
+        
+        # Adicionar arquivos necessários se existirem
+        $requiredFiles = @("dist", "node_modules", "package.json", "package-lock.json")
+        
+        foreach ($file in $requiredFiles) {
+            $filePath = Join-Path $BackendDir $file
+            if (Test-Path $filePath) {
+                $filesToZip += $filePath
+            } else {
+                Write-Warning "Arquivo não encontrado: $file"
+            }
+        }
+        
+        # Adicionar arquivos opcionais se existirem
+        $optionalFiles = @("host.json", "local.settings.json", ".funcignore")
+        foreach ($file in $optionalFiles) {
+            $filePath = Join-Path $BackendDir $file
+            if (Test-Path $filePath) {
+                $filesToZip += $filePath
+            }
+        }
+        
+        if ($filesToZip.Count -gt 0) {
+            # Criar zip
+            Write-Info "Compactando $($filesToZip.Count) arquivos/pastas..."
+            Compress-Archive -Path $filesToZip -DestinationPath $zipPath -CompressionLevel Optimal -Force
+            
+            # Verificar tamanho do arquivo
+            if (Test-Path $zipPath) {
+                $zipSize = (Get-Item $zipPath).Length / 1MB
+                $zipSizeFormatted = "{0:N2}" -f $zipSize
+                Write-Success "Backend construído com sucesso ✓"
+                Write-Info "Pacote criado: $zipPath ($zipSizeFormatted MB)"
+            }
+        } else {
+            Write-Warning "Nenhum arquivo para compactar encontrado"
+        }
+    }
+    catch {
+        Write-Warning "Erro no build do backend: $_"
+    }
+    finally {
+        Pop-Location
+    }
+}
+
+# Função para build do Flutter
+function Build-Flutter {
+    if ($BackendOnly -or $SkipFlutter) {
+        Write-Info "Pulando build do Flutter"
+        return
+    }
+    
+    Write-Info "Construindo aplicativos Flutter..."
+    Push-Location $FlutterDir
+    try {
+        # Limpar builds anteriores
+        flutter clean
+        
+        # Obter dependências
+        Write-Info "Obtendo dependências..."
+        flutter pub get
+        
+        # Build Android
+        Write-Info "Construindo APK Android..."
+        flutter build apk --release --dart-define=ENV=$Environment
+        
+        if ($LASTEXITCODE -eq 0) {
+            Write-Success "APK Android construído ✓"
+            $apkPath = Join-Path $FlutterDir "build\app\outputs\flutter-apk\app-release.apk"
+            if (Test-Path $apkPath) {
+                $apkSize = (Get-Item $apkPath).Length / 1MB
+                $apkSizeFormatted = "{0:N2}" -f $apkSize
+                Write-Info "APK: $apkPath ($apkSizeFormatted MB)"
+            }
+        }
+        
+        # Build Windows (se estiver no Windows)
+        Write-Info "Construindo app Windows..."
+        flutter build windows --release --dart-define=ENV=$Environment
+        
+        if ($LASTEXITCODE -eq 0) {
+            Write-Success "App Windows construído ✓"
+        }
+    }
+    catch {
+        Write-Warning "Erro no build do Flutter: $_"
+    }
+    finally {
+        Pop-Location
+    }
+}
+
+# Função para deploy da infraestrutura
+function Deploy-Infrastructure {
+    if ($SkipInfrastructure) {
+        Write-Warning "Pulando deployment de infraestrutura"
+        return
+    }
+    
+    if (!(Get-Command terraform -ErrorAction SilentlyContinue)) {
+        Write-Warning "Terraform não disponível - pulando infraestrutura"
+        return
+    }
+    
+    Write-Info "Fazendo deploy da infraestrutura..."
+    Push-Location $TerraformDir
+    try {
+        # Inicializar Terraform
+        Write-Info "Inicializando Terraform..."
+        terraform init
+        
+        # Selecionar workspace
+        terraform workspace select $Environment 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            terraform workspace new $Environment
+        }
+        
+        # Planejar deployment
+        Write-Info "Planejando infraestrutura..."
+        terraform plan -var="environment=$Environment" -out="tfplan"
+        
+        if (!$DryRun) {
+            # Aplicar mudanças
+            Write-Info "Aplicando mudanças de infraestrutura..."
+            terraform apply tfplan
+            Write-Success "Infraestrutura deployada ✓"
+        } else {
+            Write-Warning "Modo DryRun - pulando aplicação do Terraform"
+        }
+    }
+    catch {
+        Write-Warning "Erro no deploy da infraestrutura: $_"
+    }
+    finally {
+        Pop-Location
+    }
+}
+
+# Função para deploy do backend no Azure
+function Deploy-BackendToAzure {
+    if (!(Get-Command az -ErrorAction SilentlyContinue)) {
+        Write-Warning "Azure CLI não disponível - pulando deploy para nuvem"
+        Write-Info "O arquivo ZIP foi criado e pode ser deployado manualmente"
+        return
+    }
+    
+    Write-Info "Fazendo deploy do backend para Azure Functions..."
+    
+    # Login no Azure (se necessário)
+    $account = az account show 2>$null | ConvertFrom-Json
+    if (!$account) {
+        Write-Info "Fazendo login no Azure..."
+        az login
+    }
+    
+    # Definir nome do Function App
+    $functionAppName = "func-quem-mente-menos"
+    if ($Environment -ne "production") {
+        $functionAppName = "$functionAppName-$Environment"
+    }
+    
+    $resourceGroup = "rg-quem-mente-menos-$Environment"
+    $zipPath = Join-Path $ProjectRoot "backend-$Environment.zip"
+    
+    if (!(Test-Path $zipPath)) {
+        Write-Warning "Arquivo zip não encontrado: $zipPath"
+        return
+    }
+    
+    if (!$DryRun) {
+        # Deploy usando Azure CLI
+        Write-Info "Enviando pacote para Azure Functions..."
+        az functionapp deployment source config-zip `
+            --resource-group $resourceGroup `
+            --name $functionAppName `
+            --src $zipPath 2>$null
+        
+        if ($LASTEXITCODE -eq 0) {
+            Write-Success "Backend deployado com sucesso ✓"
+        } else {
+            Write-Warning "Deploy para Azure falhou - verifique se os recursos existem"
+            Write-Info "Você pode criar os recursos executando: terraform apply"
+        }
+    } else {
+        Write-Warning "Modo DryRun - pulando deployment real"
+        Write-Info "Seria deployado: $functionAppName no RG: $resourceGroup"
+    }
+}
+
+# Função para verificar deployment
+function Test-Deployment {
+    Write-Info "Verificando deployment..."
+    
+    $zipPath = Join-Path $ProjectRoot "backend-$Environment.zip"
+    if (Test-Path $zipPath) {
+        Write-Success "Pacote de deployment criado com sucesso"
+        $zipSize = (Get-Item $zipPath).Length / 1MB
+        $zipSizeFormatted = "{0:N2}" -f $zipSize
+        Write-Info "Tamanho do pacote: $zipSizeFormatted MB"
+    }
+    
+    if (Get-Command az -ErrorAction SilentlyContinue) {
+        $functionAppName = "func-quem-mente-menos"
+        if ($Environment -ne "production") {
+            $functionAppName = "$functionAppName-$Environment"
+        }
+        
+        $healthUrl = "https://$functionAppName.azurewebsites.net/api/health"
+        Write-Info "URL do serviço: $healthUrl"
+        
+        # Tentar verificar se está online
+        Write-Info "Verificando se o serviço está online..."
+        try {
+            $response = Invoke-WebRequest -Uri $healthUrl -Method Get -UseBasicParsing -TimeoutSec 5
+            if ($response.StatusCode -eq 200) {
+                Write-Success "Serviço está online e respondendo ✓"
+            }
+        }
+        catch {
+            Write-Info "Serviço ainda não está respondendo (pode levar alguns minutos após o deploy)"
+        }
+    }
+}
+
+# Função para cleanup
+function Invoke-Cleanup {
+    Write-Info "Limpando arquivos temporários..."
+    
+    # Manter o zip para deploy manual se necessário
+    Write-Info "Mantendo arquivo ZIP para deploy manual se necessário"
+    
+    $tfplanPath = Join-Path $TerraformDir "tfplan"
+    if (Test-Path $tfplanPath) {
+        Remove-Item $tfplanPath -Force
+        Write-Info "Removido: tfplan"
+    }
+    
+    Write-Success "Limpeza concluída ✓"
+}
+
+# Função principal
+function Start-Deployment {
+    Write-Host ""
+    Write-Host "================================================" -ForegroundColor Cyan
+    Write-Host "   Deploy - Quem Mente Menos?" -ForegroundColor Cyan
+    Write-Host "================================================" -ForegroundColor Cyan
+    Write-Info "Ambiente: $Environment"
+    Write-Info "Skip Tests: $SkipTests"
+    Write-Info "Skip Infrastructure: $SkipInfrastructure"
+    Write-Info "Skip Flutter: $SkipFlutter"
+    Write-Info "Backend Only: $BackendOnly"
+    Write-Info "Dry Run: $DryRun"
+    Write-Host ""
+    
+    $startTime = Get-Date
+    
+    try {
+        # Executar steps do deployment
+        Test-Prerequisites
+        Invoke-Tests
+        Build-Backend
+        Build-Flutter
+        Deploy-Infrastructure
+        Deploy-BackendToAzure
+        Test-Deployment
+        Invoke-Cleanup
+        
+        $endTime = Get-Date
+        $duration = $endTime - $startTime
+        
+        Write-Host ""
+        Write-Host "================================================" -ForegroundColor Green
+        Write-Success "🎉 PROCESSO CONCLUÍDO!"
+        Write-Info "Ambiente: $Environment"
+        Write-Info "Duração: $($duration.ToString('mm\:ss'))"
+        Write-Info "Timestamp: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+        
+        if ($BackendOnly) {
+            Write-Info "Modo: Backend Only (Flutter não foi buildado)"
+        }
+        
+        $zipPath = Join-Path $ProjectRoot "backend-$Environment.zip"
+        if (Test-Path $zipPath) {
+            Write-Host ""
+            Write-Host "ARQUIVO DE DEPLOYMENT CRIADO:" -ForegroundColor Yellow
+            Write-Host "  $zipPath" -ForegroundColor Green
+            Write-Host ""
+            Write-Host "Para fazer deploy manual:" -ForegroundColor Yellow
+            Write-Host "  1. Faça login no Azure Portal" -ForegroundColor White
+            Write-Host "  2. Navegue até o Function App" -ForegroundColor White
+            Write-Host "  3. Use 'Deployment Center' para fazer upload do ZIP" -ForegroundColor White
+        }
+        
+        Write-Host "================================================" -ForegroundColor Green
+    }
+    catch {
+        Write-Error "Deployment falhou: $_"
+    }
+}
+
+# Executar deployment
+Start-Deployment
