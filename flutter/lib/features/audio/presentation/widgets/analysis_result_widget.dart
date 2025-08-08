@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:quem_mente_menos/core/theme/app_colors.dart';
-import 'package:quem_mente_menos/features/audio/domain/entities/analysis_result.dart';
+import 'package:mentira_app/core/theme/app_colors.dart';
+import 'package:mentira_app/features/audio/domain/entities/analysis_result.dart';
 import 'package:share_plus/share_plus.dart';
 
 class AnalysisResultWidget extends StatefulWidget {

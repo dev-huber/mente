@@ -1,33 +1,257 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:record/record.dart';
 import 'dart:async';
-import 'package:flutter/foundation.dart';
-import '../services/audio_recorder_service.dart';
-import '../services/audio_upload_service.dart';
+import 'dart:io';
+import 'dart:math';
 
-/// Defensive provider for audio capture functionality with comprehensive state management
-class AudioCaptureProvider extends ChangeNotifier {
-  // Services
-  final AudioRecorderService _recorderService = AudioRecorderService();
-  final AudioUploadService _uploadService = AudioUploadService();
+/// Estados do áudio
+abstract class AudioCaptureState {
+  const AudioCaptureState();
+}
 
-  // State management
-  AudioRecordingState _state = AudioRecordingState.uninitialized;
-  Duration _recordingDuration = Duration.zero;
-  bool _isProcessing = false;
-  bool _isUploading = false;
-  String? _errorMessage;
-  AudioUploadResult<UploadResponse>? _lastUploadResult;
+class Initial extends AudioCaptureState {
+  const Initial();
+}
 
-  // Streams
-  StreamSubscription<AudioRecordingState>? _stateSubscription;
-  StreamSubscription<Duration>? _durationSubscription;
-  StreamSubscription<double>? _amplitudeSubscription;
+class RecordingState extends AudioCaptureState {
+  final Duration duration;
+  final List<double> waveformData;
+  
+  const RecordingState({
+    required this.duration,
+    required this.waveformData,
+  });
+  
+  RecordingState copyWith({
+    Duration? duration,
+    List<double>? waveformData,
+  }) {
+    return RecordingState(
+      duration: duration ?? this.duration,
+      waveformData: waveformData ?? this.waveformData,
+    );
+  }
+}
 
-  // Stream controllers for UI
-  final StreamController<double> _amplitudeController = 
-      StreamController<double>.broadcast();
+class CompletedState extends AudioCaptureState {
+  final String audioPath;
+  final Duration duration;
+  final List<double> waveformData;
+  
+  const CompletedState({
+    required this.audioPath,
+    required this.duration,
+    required this.waveformData,
+  });
+}
 
-  // Getters
-  AudioRecordingState get state => _state;
+class AnalyzingState extends AudioCaptureState {
+  final String audioPath;
+  final double progress;
+  
+  const AnalyzingState({
+    required this.audioPath,
+    required this.progress,
+  });
+}
+
+class AnalysisCompleteState extends AudioCaptureState {
+  final AnalysisResult result;
+  final String audioPath;
+  
+  const AnalysisCompleteState({
+    required this.result,
+    required this.audioPath,
+  });
+}
+
+class ErrorState extends AudioCaptureState {
+  final String message;
+  final String? audioPath;
+  
+  const ErrorState({
+    required this.message,
+    this.audioPath,
+  });
+}
+
+/// Resultado da análise
+class AnalysisResult {
+  final double lieDetectionScore;
+  final String confidence;
+  final Map<String, dynamic> details;
+  final DateTime timestamp;
+  
+  const AnalysisResult({
+    required this.lieDetectionScore,
+    required this.confidence,
+    required this.details,
+    required this.timestamp,
+  });
+  
+  factory AnalysisResult.fromJson(Map<String, dynamic> json) {
+    return AnalysisResult(
+      lieDetectionScore: (json['lieDetectionScore'] ?? 0.0).toDouble(),
+      confidence: json['confidence'] ?? 'low',
+      details: json['details'] ?? {},
+      timestamp: DateTime.tryParse(json['timestamp'] ?? '') ?? DateTime.now(),
+    );
+  }
+  
+  Map<String, dynamic> toJson() {
+    return {
+      'lieDetectionScore': lieDetectionScore,
+      'confidence': confidence,
+      'details': details,
+      'timestamp': timestamp.toIso8601String(),
+    };
+  }
+}
+
+/// Provider para captura e análise de áudio
+class AudioCaptureNotifier extends StateNotifier<AudioCaptureState> {
+  final AudioRecorder _recorder = AudioRecorder();
+  Timer? _recordingTimer;
+  Timer? _waveformTimer;
+  Duration _currentDuration = Duration.zero;
+  List<double> _waveformData = [];
+  
+  AudioCaptureNotifier() : super(const Initial());
+  
+  /// Inicia a gravação
+  Future<void> startRecording() async {
+    try {
+      if (await _recorder.hasPermission()) {
+        final tempDir = Directory.systemTemp;
+        final audioPath = '${tempDir.path}/recording_${DateTime.now().millisecondsSinceEpoch}.m4a';
+        
+        await _recorder.start(
+          const RecordConfig(
+            encoder: AudioEncoder.aacLc,
+            bitRate: 128000,
+            sampleRate: 44100,
+          ),
+          path: audioPath,
+        );
+        
+        _currentDuration = Duration.zero;
+        _waveformData = [];
+        
+        _startRecordingTimer();
+        _startWaveformSimulation();
+        
+        state = RecordingState(
+          duration: _currentDuration,
+          waveformData: _waveformData,
+        );
+      } else {
+        state = const ErrorState(message: 'Permissão de microfone negada');
+      }
+    } catch (e) {
+      state = ErrorState(message: 'Erro ao iniciar gravação: $e');
+    }
+  }
+  
+  /// Para a gravação
+  Future<void> stopRecording() async {
+    try {
+      _recordingTimer?.cancel();
+      _waveformTimer?.cancel();
+      
+      final audioPath = await _recorder.stop();
+      
+      if (audioPath != null) {
+        state = CompletedState(
+          audioPath: audioPath,
+          duration: _currentDuration,
+          waveformData: List.from(_waveformData),
+        );
+      } else {
+        state = const ErrorState(message: 'Falha ao salvar gravação');
+      }
+    } catch (e) {
+      state = ErrorState(message: 'Erro ao parar gravação: $e');
+    }
+  }
+  
+  /// Analisa o áudio gravado
+  Future<void> analyzeAudio(String audioPath) async {
+    try {
+      state = AnalyzingState(audioPath: audioPath, progress: 0.0);
+      
+      // Simular progresso de análise
+      for (int i = 0; i <= 100; i += 10) {
+        await Future.delayed(const Duration(milliseconds: 300));
+        state = AnalyzingState(audioPath: audioPath, progress: i / 100);
+      }
+      
+      // Simular resultado de análise
+      final result = AnalysisResult(
+        lieDetectionScore: Random().nextDouble(),
+        confidence: ['high', 'medium', 'low'][Random().nextInt(3)],
+        details: {
+          'speechRate': Random().nextDouble() * 200 + 100,
+          'pauseDuration': Random().nextDouble() * 2,
+          'voiceTremor': Random().nextBool(),
+          'stressLevel': Random().nextDouble(),
+        },
+        timestamp: DateTime.now(),
+      );
+      
+      state = AnalysisCompleteState(result: result, audioPath: audioPath);
+    } catch (e) {
+      state = ErrorState(message: 'Erro na análise: $e', audioPath: audioPath);
+    }
+  }
+  
+  /// Reseta o estado
+  void reset() {
+    _recordingTimer?.cancel();
+    _waveformTimer?.cancel();
+    _currentDuration = Duration.zero;
+    _waveformData = [];
+    state = const Initial();
+  }
+  
+  void _startRecordingTimer() {
+    _recordingTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      _currentDuration = Duration(seconds: timer.tick);
+      
+      if (state is RecordingState) {
+        state = (state as RecordingState).copyWith(duration: _currentDuration);
+      }
+    });
+  }
+  
+  void _startWaveformSimulation() {
+    _waveformTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+      final amplitude = Random().nextDouble() * 0.8 + 0.1;
+      _waveformData.add(amplitude);
+      
+      // Manter apenas os últimos 100 pontos
+      if (_waveformData.length > 100) {
+        _waveformData.removeAt(0);
+      }
+      
+      if (state is RecordingState) {
+        state = (state as RecordingState).copyWith(waveformData: List.from(_waveformData));
+      }
+    });
+  }
+  
+  @override
+  void dispose() {
+    _recordingTimer?.cancel();
+    _waveformTimer?.cancel();
+    _recorder.dispose();
+    super.dispose();
+  }
+}
+
+/// Provider global para captura de áudio
+final audioCaptureProvider = StateNotifierProvider<AudioCaptureNotifier, AudioCaptureState>(
+  (ref) => AudioCaptureNotifier(),
+);
   Duration get recordingDuration => _recordingDuration;
   bool get isRecording => _recorderService.isRecording;
   bool get isPaused => _recorderService.isPaused;

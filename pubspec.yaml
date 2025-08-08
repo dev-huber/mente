@@ -15,24 +15,27 @@ dependencies:
   flutter_sound: ^9.2.13
   permission_handler: ^11.0.1
   
+  # State management and reactive programming
+  flutter_riverpod: ^2.4.0
+  provider: ^6.0.5
+  rxdart: ^0.27.7
+  
   # HTTP and networking
   http: ^1.1.0
   dio: ^5.3.2
-  
-  # State management and reactive programming
-  provider: ^6.0.5
-  rxdart: ^0.27.7
   
   # Storage and caching
   shared_preferences: ^2.2.2
   path_provider: ^2.1.1
   
-  # Logging and debugging
-  logger: ^2.0.2+1
-  
   # UI and animations
   flutter_spinkit: ^5.2.0
   lottie: ^2.7.0
+  percent_indicator: ^4.2.2
+  share_plus: ^7.2.1
+  
+  # Logging and debugging
+  logger: ^2.0.2+1
   
   # Utilities
   uuid: ^4.1.0

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
-import 'package:quem_mente_menos/core/theme/app_colors.dart';
+import 'package:mentira_app/core/theme/app_colors.dart';
 
 class AudioWaveformWidget extends StatefulWidget {
   final List<double> waveform;

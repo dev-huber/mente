@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'pages/audio_capture_page.dart';
-import 'providers/audio_capture_provider.dart';
 
 /// Main application with defensive initialization and error boundaries
 void main() {
@@ -13,7 +12,11 @@ void main() {
     debugPrint('Stack Trace: ${details.stack}');
   };
 
-  runApp(const MentiraApp());
+  runApp(
+    const ProviderScope(
+      child: MentiraApp(),
+    ),
+  );
 }
 
 /// Root application widget with provider setup and error boundaries

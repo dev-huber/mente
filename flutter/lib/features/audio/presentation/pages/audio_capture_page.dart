@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:quem_mente_menos/core/theme/app_colors.dart';
-import 'package:quem_mente_menos/features/audio/presentation/providers/audio_capture_provider.dart';
-import 'package:quem_mente_menos/features/audio/presentation/widgets/audio_waveform_widget.dart';
-import 'package:quem_mente_menos/features/audio/presentation/widgets/recording_controls_widget.dart';
-import 'package:quem_mente_menos/features/audio/presentation/widgets/analysis_result_widget.dart';
+import 'package:mentira_app/core/theme/app_colors.dart';
+import 'package:mentira_app/features/audio/presentation/providers/audio_capture_provider.dart';
+import 'package:mentira_app/features/audio/presentation/widgets/audio_waveform_widget.dart';
+import 'package:mentira_app/features/audio/presentation/widgets/recording_controls_widget.dart';
+import 'package:mentira_app/features/audio/presentation/widgets/analysis_result_widget.dart';
 
 class AudioCapturePage extends ConsumerStatefulWidget {
   const AudioCapturePage({super.key});
