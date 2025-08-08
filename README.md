@@ -1,11 +1,15 @@
 # 🎯 Quem Mente Menos?
 
-[![CI/CD Pipeline](https://github.com/username/quem-mente-menos/workflows/CI%2FCD%20Pipeline/badge.svg)](https://github.com/username/quem-mente-menos/actions)
-[![codecov](https://codecov.io/gh/username/quem-mente-menos/branch/main/graph/badge.svg)](https://codecov.io/gh/username/quem-mente-menos)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=quem-mente-menos&metric=alert_status)](https://sonarcloud.io/dashboard?id=quem-mente-menos)
+[![Deploy Status](https://github.com/dev-huber/mente/workflows/Deploy%20to%20GitHub%20Pages/badge.svg)](https://github.com/dev-huber/mente/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 > 🔍 Aplicativo revolucionário de detecção de mentiras usando IA avançada para análise de voz e padrões linguísticos.
+
+## 🚀 **Deploy Automático Configurado**
+
+- **🌐 Site Principal:** https://dev-huber.github.io/mente/
+- **🔗 Repositório:** https://github.com/dev-huber/mente
+- **📊 Actions:** https://github.com/dev-huber/mente/actions
 
 ## 📋 Índice
 
