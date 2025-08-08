@@ -1,0 +1,209 @@
+﻿2025-08-08T22:57:02.7803109Z Current runner version: '2.327.1'
+2025-08-08T22:57:02.7858743Z ##[group]Runner Image Provisioner
+2025-08-08T22:57:02.7859862Z Hosted Compute Agent
+2025-08-08T22:57:02.7860699Z Version: 20250711.363
+2025-08-08T22:57:02.7861690Z Commit: 6785254374ce925a23743850c1cb91912ce5c14c
+2025-08-08T22:57:02.7862861Z Build Date: 2025-07-11T20:04:25Z
+2025-08-08T22:57:02.7863759Z ##[endgroup]
+2025-08-08T22:57:02.7864687Z ##[group]Operating System
+2025-08-08T22:57:02.7865643Z Ubuntu
+2025-08-08T22:57:02.7866318Z 24.04.2
+2025-08-08T22:57:02.7887654Z LTS
+2025-08-08T22:57:02.7888473Z ##[endgroup]
+2025-08-08T22:57:02.7889406Z ##[group]Runner Image
+2025-08-08T22:57:02.7890339Z Image: ubuntu-24.04
+2025-08-08T22:57:02.7891272Z Version: 20250804.2.0
+2025-08-08T22:57:02.7892998Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250804.2/images/ubuntu/Ubuntu2404-Readme.md
+2025-08-08T22:57:02.7895916Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250804.2
+2025-08-08T22:57:02.7898003Z ##[endgroup]
+2025-08-08T22:57:02.7899950Z ##[group]GITHUB_TOKEN Permissions
+2025-08-08T22:57:02.7902524Z Contents: read
+2025-08-08T22:57:02.7903546Z Metadata: read
+2025-08-08T22:57:02.7904349Z Packages: read
+2025-08-08T22:57:02.7905103Z ##[endgroup]
+2025-08-08T22:57:02.7928920Z Secret source: Actions
+2025-08-08T22:57:02.7930468Z Prepare workflow directory
+2025-08-08T22:57:02.8613790Z Prepare all required actions
+2025-08-08T22:57:02.8670297Z Getting action download info
+2025-08-08T22:57:03.2674024Z ##[group]Download immutable action package 'actions/checkout@v4'
+2025-08-08T22:57:03.2675086Z Version: 4.2.2
+2025-08-08T22:57:03.2676204Z Digest: sha256:ccb2698953eaebd21c7bf6268a94f9c26518a7e38e27e0b83c1fe1ad049819b1
+2025-08-08T22:57:03.2677858Z Source commit SHA: 11bd71901bbe5b1630ceea73d27597364c9af683
+2025-08-08T22:57:03.2678564Z ##[endgroup]
+2025-08-08T22:57:03.3446235Z ##[group]Download immutable action package 'actions/setup-node@v4'
+2025-08-08T22:57:03.3447402Z Version: 4.4.0
+2025-08-08T22:57:03.3448265Z Digest: sha256:9427cefe82346e992fb5b949e3569b39d537ae41aa3086483b14eceebfc16bc1
+2025-08-08T22:57:03.3449308Z Source commit SHA: 49933ea5288caeca8642d1e84afbd3f7d6820020
+2025-08-08T22:57:03.3450078Z ##[endgroup]
+2025-08-08T22:57:03.4446423Z Download action repository 'codecov/codecov-action@v3' (SHA:ab904c41d6ece82784817410c45d8b8c02684457)
+2025-08-08T22:57:03.7961957Z Download action repository 'SonarSource/sonarcloud-github-action@master' (SHA:13a24e453e2e6262f3bb0c5fa8241031e637a028)
+2025-08-08T22:57:04.1911704Z Getting action download info
+2025-08-08T22:57:04.2949338Z Download action repository 'SonarSource/sonarqube-scan-action@v5.0.0' (SHA:0303d6b62e310685c0e34d0b9cde218036885c4d)
+2025-08-08T22:57:04.7183463Z Getting action download info
+2025-08-08T22:57:04.8419815Z ##[group]Download immutable action package 'actions/cache@v4'
+2025-08-08T22:57:04.8421128Z Version: 4.2.4
+2025-08-08T22:57:04.8422506Z Digest: sha256:0ce81a78be9a512dff294f151044f903a6b54593e7b355dcbf964e8d583e47aa
+2025-08-08T22:57:04.8424563Z Source commit SHA: 0400d5f644dc74513175e3cd8d07132dd4860809
+2025-08-08T22:57:04.8426013Z ##[endgroup]
+2025-08-08T22:57:05.1480533Z Complete job name: Backend Quality Check
+2025-08-08T22:57:05.2296159Z ##[group]Run actions/checkout@v4
+2025-08-08T22:57:05.2297974Z with:
+2025-08-08T22:57:05.2298925Z   repository: dev-huber/mente
+2025-08-08T22:57:05.2300162Z   token: ***
+2025-08-08T22:57:05.2300926Z   ssh-strict: true
+2025-08-08T22:57:05.2301691Z   ssh-user: git
+2025-08-08T22:57:05.2302489Z   persist-credentials: true
+2025-08-08T22:57:05.2303382Z   clean: true
+2025-08-08T22:57:05.2304160Z   sparse-checkout-cone-mode: true
+2025-08-08T22:57:05.2305102Z   fetch-depth: 1
+2025-08-08T22:57:05.2305853Z   fetch-tags: false
+2025-08-08T22:57:05.2306632Z   show-progress: true
+2025-08-08T22:57:05.2307897Z   lfs: false
+2025-08-08T22:57:05.2308641Z   submodules: false
+2025-08-08T22:57:05.2309438Z   set-safe-directory: true
+2025-08-08T22:57:05.2310628Z env:
+2025-08-08T22:57:05.2311339Z   NODE_VERSION: 20.x
+2025-08-08T22:57:05.2312552Z   FLUTTER_VERSION: 3.24.0
+2025-08-08T22:57:05.2313503Z   AZURE_FUNCTIONAPP_NAME: quem-mente-menos-api
+2025-08-08T22:57:05.2314677Z   RESOURCE_GROUP: rg-quem-mente-menos
+2025-08-08T22:57:05.2315667Z ##[endgroup]
+2025-08-08T22:57:05.3546528Z Syncing repository: dev-huber/mente
+2025-08-08T22:57:05.3550689Z ##[group]Getting Git version info
+2025-08-08T22:57:05.3552636Z Working directory is '/home/runner/work/mente/mente'
+2025-08-08T22:57:05.3557848Z [command]/usr/bin/git version
+2025-08-08T22:57:05.3559429Z git version 2.50.1
+2025-08-08T22:57:05.3596036Z ##[endgroup]
+2025-08-08T22:57:05.3610182Z Temporarily overriding HOME='/home/runner/work/_temp/f80008ff-aa7a-4a88-be3b-7c47db7375a5' before making global git config changes
+2025-08-08T22:57:05.3630526Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-08T22:57:05.3634722Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mente/mente
+2025-08-08T22:57:05.3700889Z Deleting the contents of '/home/runner/work/mente/mente'
+2025-08-08T22:57:05.3709567Z ##[group]Initializing the repository
+2025-08-08T22:57:05.3711948Z [command]/usr/bin/git init /home/runner/work/mente/mente
+2025-08-08T22:57:05.3771531Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-08-08T22:57:05.3775709Z hint: is subject to change. To configure the initial branch name to use in all
+2025-08-08T22:57:05.3779645Z hint: of your new repositories, which will suppress this warning, call:
+2025-08-08T22:57:05.3781906Z hint:
+2025-08-08T22:57:05.3783476Z hint: 	git config --global init.defaultBranch <name>
+2025-08-08T22:57:05.3785403Z hint:
+2025-08-08T22:57:05.3787467Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-08-08T22:57:05.3790528Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-08-08T22:57:05.3792924Z hint:
+2025-08-08T22:57:05.3794130Z hint: 	git branch -m <name>
+2025-08-08T22:57:05.3795471Z hint:
+2025-08-08T22:57:05.3797604Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2025-08-08T22:57:05.3802703Z Initialized empty Git repository in /home/runner/work/mente/mente/.git/
+2025-08-08T22:57:05.3807872Z [command]/usr/bin/git remote add origin https://github.com/dev-huber/mente
+2025-08-08T22:57:05.3841104Z ##[endgroup]
+2025-08-08T22:57:05.3843286Z ##[group]Disabling automatic garbage collection
+2025-08-08T22:57:05.3845312Z [command]/usr/bin/git config --local gc.auto 0
+2025-08-08T22:57:05.3874626Z ##[endgroup]
+2025-08-08T22:57:05.3876760Z ##[group]Setting up auth
+2025-08-08T22:57:05.3886871Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-08T22:57:05.3921510Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-08T22:57:05.4196230Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-08T22:57:05.4235238Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-08T22:57:05.4474888Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-08-08T22:57:05.4515943Z ##[endgroup]
+2025-08-08T22:57:05.4520620Z ##[group]Fetching the repository
+2025-08-08T22:57:05.4540306Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +8f0146372afe0f55ed6668e4b50f53c4bb8ff01c:refs/remotes/origin/main
+2025-08-08T22:57:06.7513326Z From https://github.com/dev-huber/mente
+2025-08-08T22:57:06.7514601Z  * [new ref]         8f0146372afe0f55ed6668e4b50f53c4bb8ff01c -> origin/main
+2025-08-08T22:57:06.7550458Z ##[endgroup]
+2025-08-08T22:57:06.7551064Z ##[group]Determining the checkout info
+2025-08-08T22:57:06.7551712Z ##[endgroup]
+2025-08-08T22:57:06.7557818Z [command]/usr/bin/git sparse-checkout disable
+2025-08-08T22:57:06.7602026Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2025-08-08T22:57:06.7634143Z ##[group]Checking out the ref
+2025-08-08T22:57:06.7639658Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2025-08-08T22:57:06.9470689Z Switched to a new branch 'main'
+2025-08-08T22:57:06.9474766Z branch 'main' set up to track 'origin/main'.
+2025-08-08T22:57:06.9492712Z ##[endgroup]
+2025-08-08T22:57:06.9547694Z [command]/usr/bin/git log -1 --format=%H
+2025-08-08T22:57:06.9591132Z 8f0146372afe0f55ed6668e4b50f53c4bb8ff01c
+2025-08-08T22:57:06.9848804Z ##[group]Run actions/setup-node@v4
+2025-08-08T22:57:06.9849102Z with:
+2025-08-08T22:57:06.9849281Z   node-version: 20.x
+2025-08-08T22:57:06.9849475Z   cache: npm
+2025-08-08T22:57:06.9849715Z   cache-dependency-path: backend/package-lock.json
+2025-08-08T22:57:06.9850019Z   always-auth: false
+2025-08-08T22:57:06.9850230Z   check-latest: false
+2025-08-08T22:57:06.9850562Z   token: ***
+2025-08-08T22:57:06.9850736Z env:
+2025-08-08T22:57:06.9850904Z   NODE_VERSION: 20.x
+2025-08-08T22:57:06.9851100Z   FLUTTER_VERSION: 3.24.0
+2025-08-08T22:57:06.9851349Z   AZURE_FUNCTIONAPP_NAME: quem-mente-menos-api
+2025-08-08T22:57:06.9851638Z   RESOURCE_GROUP: rg-quem-mente-menos
+2025-08-08T22:57:06.9851883Z ##[endgroup]
+2025-08-08T22:57:07.1698961Z Found in cache @ /opt/hostedtoolcache/node/20.19.4/x64
+2025-08-08T22:57:07.1705801Z ##[group]Environment details
+2025-08-08T22:57:07.6320002Z node: v20.19.4
+2025-08-08T22:57:07.6320824Z npm: 10.8.2
+2025-08-08T22:57:07.6321600Z yarn: 1.22.22
+2025-08-08T22:57:07.6323703Z ##[endgroup]
+2025-08-08T22:57:07.6340099Z [command]/opt/hostedtoolcache/node/20.19.4/x64/bin/npm config get cache
+2025-08-08T22:57:07.7545661Z /home/runner/.npm
+2025-08-08T22:57:07.9083918Z npm cache is not found
+2025-08-08T22:57:07.9219437Z ##[group]Run npm ci
+2025-08-08T22:57:07.9219733Z [36;1mnpm ci[0m
+2025-08-08T22:57:07.9306764Z shell: /usr/bin/bash -e {0}
+2025-08-08T22:57:07.9307409Z env:
+2025-08-08T22:57:07.9307705Z   NODE_VERSION: 20.x
+2025-08-08T22:57:07.9308051Z   FLUTTER_VERSION: 3.24.0
+2025-08-08T22:57:07.9308474Z   AZURE_FUNCTIONAPP_NAME: quem-mente-menos-api
+2025-08-08T22:57:07.9309013Z   RESOURCE_GROUP: rg-quem-mente-menos
+2025-08-08T22:57:07.9309418Z ##[endgroup]
+2025-08-08T22:57:11.2294361Z npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+2025-08-08T22:57:11.5516438Z npm warn deprecated npmlog@5.0.1: This package is no longer supported.
+2025-08-08T22:57:11.6340603Z npm warn deprecated multer@1.4.5-lts.2: Multer 1.x is impacted by a number of vulnerabilities, which have been patched in 2.x. You should upgrade to the latest 2.x version.
+2025-08-08T22:57:12.1296152Z npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+2025-08-08T22:57:12.4422332Z npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+2025-08-08T22:57:12.6252793Z npm warn deprecated gauge@3.0.2: This package is no longer supported.
+2025-08-08T22:57:12.8272378Z npm warn deprecated are-we-there-yet@2.0.0: This package is no longer supported.
+2025-08-08T22:57:13.4056110Z npm warn deprecated @humanwhocodes/config-array@0.13.0: Use @eslint/config-array instead
+2025-08-08T22:57:13.4859410Z npm warn deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead
+2025-08-08T22:57:17.1495560Z npm warn deprecated eslint@8.57.1: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+2025-08-08T22:57:19.8738271Z 
+2025-08-08T22:57:19.8739576Z added 691 packages, and audited 692 packages in 12s
+2025-08-08T22:57:19.8740279Z 
+2025-08-08T22:57:19.8740795Z 85 packages are looking for funding
+2025-08-08T22:57:19.8741505Z   run `npm fund` for details
+2025-08-08T22:57:19.8742452Z 
+2025-08-08T22:57:19.8742861Z found 0 vulnerabilities
+2025-08-08T22:57:19.9106133Z ##[group]Run npm run lint
+2025-08-08T22:57:19.9106435Z [36;1mnpm run lint[0m
+2025-08-08T22:57:19.9146354Z shell: /usr/bin/bash -e {0}
+2025-08-08T22:57:19.9146598Z env:
+2025-08-08T22:57:19.9146761Z   NODE_VERSION: 20.x
+2025-08-08T22:57:19.9146969Z   FLUTTER_VERSION: 3.24.0
+2025-08-08T22:57:19.9147513Z   AZURE_FUNCTIONAPP_NAME: quem-mente-menos-api
+2025-08-08T22:57:19.9147811Z   RESOURCE_GROUP: rg-quem-mente-menos
+2025-08-08T22:57:19.9148048Z ##[endgroup]
+2025-08-08T22:57:20.0528310Z 
+2025-08-08T22:57:20.0529953Z > quem-mente-menos-backend@1.0.0 lint
+2025-08-08T22:57:20.0530573Z > eslint src/**/*.ts
+2025-08-08T22:57:20.0530816Z 
+2025-08-08T22:57:20.3022469Z 
+2025-08-08T22:57:20.3023303Z Oops! Something went wrong! :(
+2025-08-08T22:57:20.3023671Z 
+2025-08-08T22:57:20.3023823Z ESLint: 8.57.1
+2025-08-08T22:57:20.3024011Z 
+2025-08-08T22:57:20.3024921Z ESLint couldn't find the config "@typescript-eslint/recommended" to extend from. Please check that the name of the config is correct.
+2025-08-08T22:57:20.3025804Z 
+2025-08-08T22:57:20.3026896Z The config "@typescript-eslint/recommended" was referenced from the config file in "/home/runner/work/mente/mente/backend/.eslintrc.js".
+2025-08-08T22:57:20.3027944Z 
+2025-08-08T22:57:20.3028617Z If you still have problems, please stop by https://eslint.org/chat/help to chat with the team.
+2025-08-08T22:57:20.3029228Z 
+2025-08-08T22:57:20.3179310Z ##[error]Process completed with exit code 2.
+2025-08-08T22:57:20.3271001Z Post job cleanup.
+2025-08-08T22:57:20.4241860Z [command]/usr/bin/git version
+2025-08-08T22:57:20.4283133Z git version 2.50.1
+2025-08-08T22:57:20.4331100Z Temporarily overriding HOME='/home/runner/work/_temp/ece9d277-557a-4e8e-b4a7-229f1ce47ba0' before making global git config changes
+2025-08-08T22:57:20.4333133Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-08T22:57:20.4337652Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mente/mente
+2025-08-08T22:57:20.4382679Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-08T22:57:20.4419308Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-08T22:57:20.4696929Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-08T22:57:20.4741995Z http.https://github.com/.extraheader
+2025-08-08T22:57:20.4771528Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2025-08-08T22:57:20.4828804Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-08T22:57:20.5332715Z Cleaning up orphan processes

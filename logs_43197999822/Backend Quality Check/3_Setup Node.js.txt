@@ -1,0 +1,23 @@
+﻿2025-08-08T22:57:06.9848763Z ##[group]Run actions/setup-node@v4
+2025-08-08T22:57:06.9849097Z with:
+2025-08-08T22:57:06.9849277Z   node-version: 20.x
+2025-08-08T22:57:06.9849471Z   cache: npm
+2025-08-08T22:57:06.9849711Z   cache-dependency-path: backend/package-lock.json
+2025-08-08T22:57:06.9850015Z   always-auth: false
+2025-08-08T22:57:06.9850227Z   check-latest: false
+2025-08-08T22:57:06.9850558Z   token: ***
+2025-08-08T22:57:06.9850733Z env:
+2025-08-08T22:57:06.9850901Z   NODE_VERSION: 20.x
+2025-08-08T22:57:06.9851097Z   FLUTTER_VERSION: 3.24.0
+2025-08-08T22:57:06.9851345Z   AZURE_FUNCTIONAPP_NAME: quem-mente-menos-api
+2025-08-08T22:57:06.9851634Z   RESOURCE_GROUP: rg-quem-mente-menos
+2025-08-08T22:57:06.9851879Z ##[endgroup]
+2025-08-08T22:57:07.1698884Z Found in cache @ /opt/hostedtoolcache/node/20.19.4/x64
+2025-08-08T22:57:07.1705780Z ##[group]Environment details
+2025-08-08T22:57:07.6319956Z node: v20.19.4
+2025-08-08T22:57:07.6320810Z npm: 10.8.2
+2025-08-08T22:57:07.6321585Z yarn: 1.22.22
+2025-08-08T22:57:07.6323622Z ##[endgroup]
+2025-08-08T22:57:07.6340076Z [command]/opt/hostedtoolcache/node/20.19.4/x64/bin/npm config get cache
+2025-08-08T22:57:07.7545600Z /home/runner/.npm
+2025-08-08T22:57:07.9083875Z npm cache is not found

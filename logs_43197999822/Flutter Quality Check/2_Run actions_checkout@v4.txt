@@ -1,0 +1,74 @@
+﻿2025-08-08T22:57:05.5504905Z ##[group]Run actions/checkout@v4
+2025-08-08T22:57:05.5506145Z with:
+2025-08-08T22:57:05.5506831Z   repository: dev-huber/mente
+2025-08-08T22:57:05.5507916Z   token: ***
+2025-08-08T22:57:05.5508955Z   ssh-strict: true
+2025-08-08T22:57:05.5509665Z   ssh-user: git
+2025-08-08T22:57:05.5510392Z   persist-credentials: true
+2025-08-08T22:57:05.5511208Z   clean: true
+2025-08-08T22:57:05.5511932Z   sparse-checkout-cone-mode: true
+2025-08-08T22:57:05.5512837Z   fetch-depth: 1
+2025-08-08T22:57:05.5513526Z   fetch-tags: false
+2025-08-08T22:57:05.5514244Z   show-progress: true
+2025-08-08T22:57:05.5514955Z   lfs: false
+2025-08-08T22:57:05.5515609Z   submodules: false
+2025-08-08T22:57:05.5516326Z   set-safe-directory: true
+2025-08-08T22:57:05.5517412Z env:
+2025-08-08T22:57:05.5518033Z   NODE_VERSION: 20.x
+2025-08-08T22:57:05.5519050Z   FLUTTER_VERSION: 3.24.0
+2025-08-08T22:57:05.5519922Z   AZURE_FUNCTIONAPP_NAME: quem-mente-menos-api
+2025-08-08T22:57:05.5520961Z   RESOURCE_GROUP: rg-quem-mente-menos
+2025-08-08T22:57:05.5521893Z ##[endgroup]
+2025-08-08T22:57:05.6685448Z Syncing repository: dev-huber/mente
+2025-08-08T22:57:05.6689305Z ##[group]Getting Git version info
+2025-08-08T22:57:05.6691045Z Working directory is '/home/runner/work/mente/mente'
+2025-08-08T22:57:05.6694225Z [command]/usr/bin/git version
+2025-08-08T22:57:05.6732092Z git version 2.50.1
+2025-08-08T22:57:05.6762768Z ##[endgroup]
+2025-08-08T22:57:05.6790078Z Temporarily overriding HOME='/home/runner/work/_temp/b54c2b01-1ad4-4ae7-a337-710acd796a11' before making global git config changes
+2025-08-08T22:57:05.6796220Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-08T22:57:05.6800543Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mente/mente
+2025-08-08T22:57:05.6840456Z Deleting the contents of '/home/runner/work/mente/mente'
+2025-08-08T22:57:05.6845827Z ##[group]Initializing the repository
+2025-08-08T22:57:05.6850529Z [command]/usr/bin/git init /home/runner/work/mente/mente
+2025-08-08T22:57:05.6940207Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-08-08T22:57:05.6943512Z hint: is subject to change. To configure the initial branch name to use in all
+2025-08-08T22:57:05.6948275Z hint: of your new repositories, which will suppress this warning, call:
+2025-08-08T22:57:05.6950621Z hint:
+2025-08-08T22:57:05.6952057Z hint: 	git config --global init.defaultBranch <name>
+2025-08-08T22:57:05.6954605Z hint:
+2025-08-08T22:57:05.6956291Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-08-08T22:57:05.6959264Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-08-08T22:57:05.6961410Z hint:
+2025-08-08T22:57:05.6962477Z hint: 	git branch -m <name>
+2025-08-08T22:57:05.6963748Z hint:
+2025-08-08T22:57:05.6965485Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2025-08-08T22:57:05.6968861Z Initialized empty Git repository in /home/runner/work/mente/mente/.git/
+2025-08-08T22:57:05.6974521Z [command]/usr/bin/git remote add origin https://github.com/dev-huber/mente
+2025-08-08T22:57:05.7000836Z ##[endgroup]
+2025-08-08T22:57:05.7003545Z ##[group]Disabling automatic garbage collection
+2025-08-08T22:57:05.7007137Z [command]/usr/bin/git config --local gc.auto 0
+2025-08-08T22:57:05.7036091Z ##[endgroup]
+2025-08-08T22:57:05.7038039Z ##[group]Setting up auth
+2025-08-08T22:57:05.7048179Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-08T22:57:05.7077478Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-08T22:57:05.7425069Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-08T22:57:05.7462501Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-08T22:57:05.7692378Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-08-08T22:57:05.7737429Z ##[endgroup]
+2025-08-08T22:57:05.7740935Z ##[group]Fetching the repository
+2025-08-08T22:57:05.7752463Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +8f0146372afe0f55ed6668e4b50f53c4bb8ff01c:refs/remotes/origin/main
+2025-08-08T22:57:07.1015877Z From https://github.com/dev-huber/mente
+2025-08-08T22:57:07.1017750Z  * [new ref]         8f0146372afe0f55ed6668e4b50f53c4bb8ff01c -> origin/main
+2025-08-08T22:57:07.1051519Z ##[endgroup]
+2025-08-08T22:57:07.1066783Z ##[group]Determining the checkout info
+2025-08-08T22:57:07.1068300Z ##[endgroup]
+2025-08-08T22:57:07.1076974Z [command]/usr/bin/git sparse-checkout disable
+2025-08-08T22:57:07.1149076Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2025-08-08T22:57:07.1200791Z ##[group]Checking out the ref
+2025-08-08T22:57:07.1211043Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2025-08-08T22:57:07.3401179Z Switched to a new branch 'main'
+2025-08-08T22:57:07.3405377Z branch 'main' set up to track 'origin/main'.
+2025-08-08T22:57:07.3440042Z ##[endgroup]
+2025-08-08T22:57:07.3515119Z [command]/usr/bin/git log -1 --format=%H
+2025-08-08T22:57:07.3531472Z 8f0146372afe0f55ed6668e4b50f53c4bb8ff01c

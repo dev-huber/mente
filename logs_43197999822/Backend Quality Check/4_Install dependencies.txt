@@ -1,0 +1,26 @@
+﻿2025-08-08T22:57:07.9219417Z ##[group]Run npm ci
+2025-08-08T22:57:07.9219727Z [36;1mnpm ci[0m
+2025-08-08T22:57:07.9306738Z shell: /usr/bin/bash -e {0}
+2025-08-08T22:57:07.9307398Z env:
+2025-08-08T22:57:07.9307697Z   NODE_VERSION: 20.x
+2025-08-08T22:57:07.9308045Z   FLUTTER_VERSION: 3.24.0
+2025-08-08T22:57:07.9308466Z   AZURE_FUNCTIONAPP_NAME: quem-mente-menos-api
+2025-08-08T22:57:07.9309006Z   RESOURCE_GROUP: rg-quem-mente-menos
+2025-08-08T22:57:07.9309411Z ##[endgroup]
+2025-08-08T22:57:11.2294292Z npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+2025-08-08T22:57:11.5516377Z npm warn deprecated npmlog@5.0.1: This package is no longer supported.
+2025-08-08T22:57:11.6340525Z npm warn deprecated multer@1.4.5-lts.2: Multer 1.x is impacted by a number of vulnerabilities, which have been patched in 2.x. You should upgrade to the latest 2.x version.
+2025-08-08T22:57:12.1295992Z npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+2025-08-08T22:57:12.4422156Z npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+2025-08-08T22:57:12.6252757Z npm warn deprecated gauge@3.0.2: This package is no longer supported.
+2025-08-08T22:57:12.8272333Z npm warn deprecated are-we-there-yet@2.0.0: This package is no longer supported.
+2025-08-08T22:57:13.4056071Z npm warn deprecated @humanwhocodes/config-array@0.13.0: Use @eslint/config-array instead
+2025-08-08T22:57:13.4859371Z npm warn deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead
+2025-08-08T22:57:17.1495522Z npm warn deprecated eslint@8.57.1: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+2025-08-08T22:57:19.8738225Z 
+2025-08-08T22:57:19.8739556Z added 691 packages, and audited 692 packages in 12s
+2025-08-08T22:57:19.8740272Z 
+2025-08-08T22:57:19.8740750Z 85 packages are looking for funding
+2025-08-08T22:57:19.8741499Z   run `npm fund` for details
+2025-08-08T22:57:19.8742446Z 
+2025-08-08T22:57:19.8742855Z found 0 vulnerabilities

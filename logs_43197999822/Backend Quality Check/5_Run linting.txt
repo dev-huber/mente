@@ -1,0 +1,25 @@
+﻿2025-08-08T22:57:19.9106119Z ##[group]Run npm run lint
+2025-08-08T22:57:19.9106432Z [36;1mnpm run lint[0m
+2025-08-08T22:57:19.9146348Z shell: /usr/bin/bash -e {0}
+2025-08-08T22:57:19.9146595Z env:
+2025-08-08T22:57:19.9146758Z   NODE_VERSION: 20.x
+2025-08-08T22:57:19.9146967Z   FLUTTER_VERSION: 3.24.0
+2025-08-08T22:57:19.9147509Z   AZURE_FUNCTIONAPP_NAME: quem-mente-menos-api
+2025-08-08T22:57:19.9147808Z   RESOURCE_GROUP: rg-quem-mente-menos
+2025-08-08T22:57:19.9148045Z ##[endgroup]
+2025-08-08T22:57:20.0528262Z 
+2025-08-08T22:57:20.0529936Z > quem-mente-menos-backend@1.0.0 lint
+2025-08-08T22:57:20.0530565Z > eslint src/**/*.ts
+2025-08-08T22:57:20.0530811Z 
+2025-08-08T22:57:20.3022422Z 
+2025-08-08T22:57:20.3023288Z Oops! Something went wrong! :(
+2025-08-08T22:57:20.3023666Z 
+2025-08-08T22:57:20.3023819Z ESLint: 8.57.1
+2025-08-08T22:57:20.3024007Z 
+2025-08-08T22:57:20.3024909Z ESLint couldn't find the config "@typescript-eslint/recommended" to extend from. Please check that the name of the config is correct.
+2025-08-08T22:57:20.3025739Z 
+2025-08-08T22:57:20.3026891Z The config "@typescript-eslint/recommended" was referenced from the config file in "/home/runner/work/mente/mente/backend/.eslintrc.js".
+2025-08-08T22:57:20.3027938Z 
+2025-08-08T22:57:20.3028611Z If you still have problems, please stop by https://eslint.org/chat/help to chat with the team.
+2025-08-08T22:57:20.3029222Z 
+2025-08-08T22:57:20.3179284Z ##[error]Process completed with exit code 2.

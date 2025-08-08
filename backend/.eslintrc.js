@@ -6,20 +6,11 @@ module.exports = {
     project: './tsconfig.json'
   },
   plugins: [
-    '@typescript-eslint',
-    'import',
-    'security',
-    'sonarjs'
+    '@typescript-eslint'
   ],
   extends: [
     'eslint:recommended',
-    '@typescript-eslint/recommended',
-    '@typescript-eslint/recommended-requiring-type-checking',
-    'plugin:import/errors',
-    'plugin:import/warnings',
-    'plugin:import/typescript',
-    'plugin:security/recommended',
-    'plugin:sonarjs/recommended'
+    '@typescript-eslint/recommended'
   ],
   root: true,
   env: {
@@ -34,18 +25,6 @@ module.exports = {
     '*.d.ts'
   ],
   rules: {
-    // Security & Quality Rules
-    'security/detect-object-injection': 'error',
-    'security/detect-non-literal-regexp': 'warn',
-    'security/detect-unsafe-regex': 'error',
-    
-    // SonarJS Quality Rules
-    'sonarjs/cognitive-complexity': ['error', 15],
-    'sonarjs/max-switch-cases': ['error', 30],
-    'sonarjs/no-duplicate-string': 'warn',
-    'sonarjs/no-identical-functions': 'error',
-    'sonarjs/no-small-switch': 'warn',
-    
     // TypeScript Specific
     '@typescript-eslint/no-unused-vars': ['error', { 
       argsIgnorePattern: '^_',

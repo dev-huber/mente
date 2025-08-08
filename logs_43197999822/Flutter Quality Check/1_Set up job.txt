@@ -1,0 +1,41 @@
+﻿2025-08-08T22:57:03.2179608Z Current runner version: '2.327.1'
+2025-08-08T22:57:03.2213944Z ##[group]Runner Image Provisioner
+2025-08-08T22:57:03.2215230Z Hosted Compute Agent
+2025-08-08T22:57:03.2216167Z Version: 20250711.363
+2025-08-08T22:57:03.2217092Z Commit: 6785254374ce925a23743850c1cb91912ce5c14c
+2025-08-08T22:57:03.2218726Z Build Date: 2025-07-11T20:04:25Z
+2025-08-08T22:57:03.2219726Z ##[endgroup]
+2025-08-08T22:57:03.2220612Z ##[group]Operating System
+2025-08-08T22:57:03.2221738Z Ubuntu
+2025-08-08T22:57:03.2222508Z 24.04.2
+2025-08-08T22:57:03.2223238Z LTS
+2025-08-08T22:57:03.2224075Z ##[endgroup]
+2025-08-08T22:57:03.2224870Z ##[group]Runner Image
+2025-08-08T22:57:03.2225749Z Image: ubuntu-24.04
+2025-08-08T22:57:03.2226679Z Version: 20250804.2.0
+2025-08-08T22:57:03.2228654Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250804.2/images/ubuntu/Ubuntu2404-Readme.md
+2025-08-08T22:57:03.2231288Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250804.2
+2025-08-08T22:57:03.2233370Z ##[endgroup]
+2025-08-08T22:57:03.2235401Z ##[group]GITHUB_TOKEN Permissions
+2025-08-08T22:57:03.2238152Z Contents: read
+2025-08-08T22:57:03.2239317Z Metadata: read
+2025-08-08T22:57:03.2240234Z Packages: read
+2025-08-08T22:57:03.2241166Z ##[endgroup]
+2025-08-08T22:57:03.2243964Z Secret source: Actions
+2025-08-08T22:57:03.2245192Z Prepare workflow directory
+2025-08-08T22:57:03.2905063Z Prepare all required actions
+2025-08-08T22:57:03.2962898Z Getting action download info
+2025-08-08T22:57:03.7866357Z ##[group]Download immutable action package 'actions/checkout@v4'
+2025-08-08T22:57:03.7867446Z Version: 4.2.2
+2025-08-08T22:57:03.7868570Z Digest: sha256:ccb2698953eaebd21c7bf6268a94f9c26518a7e38e27e0b83c1fe1ad049819b1
+2025-08-08T22:57:03.7869861Z Source commit SHA: 11bd71901bbe5b1630ceea73d27597364c9af683
+2025-08-08T22:57:03.7870630Z ##[endgroup]
+2025-08-08T22:57:03.8768926Z Download action repository 'subosito/flutter-action@v2' (SHA:e938fdf56512cc96ef2f93601a5a40bde3801046)
+2025-08-08T22:57:04.3231936Z Download action repository 'codecov/codecov-action@v3' (SHA:ab904c41d6ece82784817410c45d8b8c02684457)
+2025-08-08T22:57:04.9431726Z Getting action download info
+2025-08-08T22:57:05.1016741Z ##[group]Download immutable action package 'actions/cache@v4'
+2025-08-08T22:57:05.1019386Z Version: 4.2.4
+2025-08-08T22:57:05.1021751Z Digest: sha256:0ce81a78be9a512dff294f151044f903a6b54593e7b355dcbf964e8d583e47aa
+2025-08-08T22:57:05.1024959Z Source commit SHA: 0400d5f644dc74513175e3cd8d07132dd4860809
+2025-08-08T22:57:05.1027035Z ##[endgroup]
+2025-08-08T22:57:05.4747515Z Complete job name: Flutter Quality Check

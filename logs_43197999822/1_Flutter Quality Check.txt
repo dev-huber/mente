@@ -1,0 +1,238 @@
+﻿2025-08-08T22:57:03.2180744Z Current runner version: '2.327.1'
+2025-08-08T22:57:03.2213971Z ##[group]Runner Image Provisioner
+2025-08-08T22:57:03.2215251Z Hosted Compute Agent
+2025-08-08T22:57:03.2216184Z Version: 20250711.363
+2025-08-08T22:57:03.2217106Z Commit: 6785254374ce925a23743850c1cb91912ce5c14c
+2025-08-08T22:57:03.2218752Z Build Date: 2025-07-11T20:04:25Z
+2025-08-08T22:57:03.2219738Z ##[endgroup]
+2025-08-08T22:57:03.2220625Z ##[group]Operating System
+2025-08-08T22:57:03.2221754Z Ubuntu
+2025-08-08T22:57:03.2222519Z 24.04.2
+2025-08-08T22:57:03.2223247Z LTS
+2025-08-08T22:57:03.2224088Z ##[endgroup]
+2025-08-08T22:57:03.2224877Z ##[group]Runner Image
+2025-08-08T22:57:03.2225757Z Image: ubuntu-24.04
+2025-08-08T22:57:03.2226690Z Version: 20250804.2.0
+2025-08-08T22:57:03.2228680Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250804.2/images/ubuntu/Ubuntu2404-Readme.md
+2025-08-08T22:57:03.2231649Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250804.2
+2025-08-08T22:57:03.2233393Z ##[endgroup]
+2025-08-08T22:57:03.2235425Z ##[group]GITHUB_TOKEN Permissions
+2025-08-08T22:57:03.2238175Z Contents: read
+2025-08-08T22:57:03.2239329Z Metadata: read
+2025-08-08T22:57:03.2240244Z Packages: read
+2025-08-08T22:57:03.2241181Z ##[endgroup]
+2025-08-08T22:57:03.2243990Z Secret source: Actions
+2025-08-08T22:57:03.2245209Z Prepare workflow directory
+2025-08-08T22:57:03.2905105Z Prepare all required actions
+2025-08-08T22:57:03.2962928Z Getting action download info
+2025-08-08T22:57:03.7866392Z ##[group]Download immutable action package 'actions/checkout@v4'
+2025-08-08T22:57:03.7867453Z Version: 4.2.2
+2025-08-08T22:57:03.7868580Z Digest: sha256:ccb2698953eaebd21c7bf6268a94f9c26518a7e38e27e0b83c1fe1ad049819b1
+2025-08-08T22:57:03.7869870Z Source commit SHA: 11bd71901bbe5b1630ceea73d27597364c9af683
+2025-08-08T22:57:03.7870634Z ##[endgroup]
+2025-08-08T22:57:03.8768948Z Download action repository 'subosito/flutter-action@v2' (SHA:e938fdf56512cc96ef2f93601a5a40bde3801046)
+2025-08-08T22:57:04.3231991Z Download action repository 'codecov/codecov-action@v3' (SHA:ab904c41d6ece82784817410c45d8b8c02684457)
+2025-08-08T22:57:04.9431758Z Getting action download info
+2025-08-08T22:57:05.1016785Z ##[group]Download immutable action package 'actions/cache@v4'
+2025-08-08T22:57:05.1019399Z Version: 4.2.4
+2025-08-08T22:57:05.1021769Z Digest: sha256:0ce81a78be9a512dff294f151044f903a6b54593e7b355dcbf964e8d583e47aa
+2025-08-08T22:57:05.1024977Z Source commit SHA: 0400d5f644dc74513175e3cd8d07132dd4860809
+2025-08-08T22:57:05.1027048Z ##[endgroup]
+2025-08-08T22:57:05.4747553Z Complete job name: Flutter Quality Check
+2025-08-08T22:57:05.5504948Z ##[group]Run actions/checkout@v4
+2025-08-08T22:57:05.5506156Z with:
+2025-08-08T22:57:05.5506836Z   repository: dev-huber/mente
+2025-08-08T22:57:05.5507920Z   token: ***
+2025-08-08T22:57:05.5508965Z   ssh-strict: true
+2025-08-08T22:57:05.5509678Z   ssh-user: git
+2025-08-08T22:57:05.5510403Z   persist-credentials: true
+2025-08-08T22:57:05.5511220Z   clean: true
+2025-08-08T22:57:05.5511936Z   sparse-checkout-cone-mode: true
+2025-08-08T22:57:05.5512841Z   fetch-depth: 1
+2025-08-08T22:57:05.5513529Z   fetch-tags: false
+2025-08-08T22:57:05.5514248Z   show-progress: true
+2025-08-08T22:57:05.5514958Z   lfs: false
+2025-08-08T22:57:05.5515613Z   submodules: false
+2025-08-08T22:57:05.5516330Z   set-safe-directory: true
+2025-08-08T22:57:05.5517422Z env:
+2025-08-08T22:57:05.5518037Z   NODE_VERSION: 20.x
+2025-08-08T22:57:05.5519055Z   FLUTTER_VERSION: 3.24.0
+2025-08-08T22:57:05.5519927Z   AZURE_FUNCTIONAPP_NAME: quem-mente-menos-api
+2025-08-08T22:57:05.5521015Z   RESOURCE_GROUP: rg-quem-mente-menos
+2025-08-08T22:57:05.5521897Z ##[endgroup]
+2025-08-08T22:57:05.6685503Z Syncing repository: dev-huber/mente
+2025-08-08T22:57:05.6689334Z ##[group]Getting Git version info
+2025-08-08T22:57:05.6691060Z Working directory is '/home/runner/work/mente/mente'
+2025-08-08T22:57:05.6694249Z [command]/usr/bin/git version
+2025-08-08T22:57:05.6732122Z git version 2.50.1
+2025-08-08T22:57:05.6762793Z ##[endgroup]
+2025-08-08T22:57:05.6790109Z Temporarily overriding HOME='/home/runner/work/_temp/b54c2b01-1ad4-4ae7-a337-710acd796a11' before making global git config changes
+2025-08-08T22:57:05.6796250Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-08T22:57:05.6800568Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mente/mente
+2025-08-08T22:57:05.6840486Z Deleting the contents of '/home/runner/work/mente/mente'
+2025-08-08T22:57:05.6845852Z ##[group]Initializing the repository
+2025-08-08T22:57:05.6850578Z [command]/usr/bin/git init /home/runner/work/mente/mente
+2025-08-08T22:57:05.6940235Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-08-08T22:57:05.6943541Z hint: is subject to change. To configure the initial branch name to use in all
+2025-08-08T22:57:05.6948299Z hint: of your new repositories, which will suppress this warning, call:
+2025-08-08T22:57:05.6950646Z hint:
+2025-08-08T22:57:05.6952079Z hint: 	git config --global init.defaultBranch <name>
+2025-08-08T22:57:05.6954631Z hint:
+2025-08-08T22:57:05.6956309Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-08-08T22:57:05.6959277Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-08-08T22:57:05.6961427Z hint:
+2025-08-08T22:57:05.6962490Z hint: 	git branch -m <name>
+2025-08-08T22:57:05.6963756Z hint:
+2025-08-08T22:57:05.6965495Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2025-08-08T22:57:05.6968908Z Initialized empty Git repository in /home/runner/work/mente/mente/.git/
+2025-08-08T22:57:05.6974549Z [command]/usr/bin/git remote add origin https://github.com/dev-huber/mente
+2025-08-08T22:57:05.7000861Z ##[endgroup]
+2025-08-08T22:57:05.7003566Z ##[group]Disabling automatic garbage collection
+2025-08-08T22:57:05.7007163Z [command]/usr/bin/git config --local gc.auto 0
+2025-08-08T22:57:05.7036117Z ##[endgroup]
+2025-08-08T22:57:05.7038050Z ##[group]Setting up auth
+2025-08-08T22:57:05.7048207Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-08T22:57:05.7077507Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-08T22:57:05.7425140Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-08T22:57:05.7462890Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-08T22:57:05.7692422Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-08-08T22:57:05.7737458Z ##[endgroup]
+2025-08-08T22:57:05.7740961Z ##[group]Fetching the repository
+2025-08-08T22:57:05.7752493Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +8f0146372afe0f55ed6668e4b50f53c4bb8ff01c:refs/remotes/origin/main
+2025-08-08T22:57:07.1015950Z From https://github.com/dev-huber/mente
+2025-08-08T22:57:07.1017771Z  * [new ref]         8f0146372afe0f55ed6668e4b50f53c4bb8ff01c -> origin/main
+2025-08-08T22:57:07.1051540Z ##[endgroup]
+2025-08-08T22:57:07.1066804Z ##[group]Determining the checkout info
+2025-08-08T22:57:07.1069290Z ##[endgroup]
+2025-08-08T22:57:07.1076996Z [command]/usr/bin/git sparse-checkout disable
+2025-08-08T22:57:07.1149145Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2025-08-08T22:57:07.1200813Z ##[group]Checking out the ref
+2025-08-08T22:57:07.1211068Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2025-08-08T22:57:07.3401247Z Switched to a new branch 'main'
+2025-08-08T22:57:07.3405399Z branch 'main' set up to track 'origin/main'.
+2025-08-08T22:57:07.3440063Z ##[endgroup]
+2025-08-08T22:57:07.3515142Z [command]/usr/bin/git log -1 --format=%H
+2025-08-08T22:57:07.3531496Z 8f0146372afe0f55ed6668e4b50f53c4bb8ff01c
+2025-08-08T22:57:07.3819672Z ##[group]Run subosito/flutter-action@v2
+2025-08-08T22:57:07.3820026Z with:
+2025-08-08T22:57:07.3820245Z   flutter-version: 3.24.0
+2025-08-08T22:57:07.3820497Z   channel: stable
+2025-08-08T22:57:07.3820716Z   architecture: X64
+2025-08-08T22:57:07.3820946Z   cache: false
+2025-08-08T22:57:07.3821179Z   pub-cache-path: default
+2025-08-08T22:57:07.3821422Z   dry-run: false
+2025-08-08T22:57:07.3821718Z   git-source: https://github.com/flutter/flutter.git
+2025-08-08T22:57:07.3822037Z env:
+2025-08-08T22:57:07.3822241Z   NODE_VERSION: 20.x
+2025-08-08T22:57:07.3822481Z   FLUTTER_VERSION: 3.24.0
+2025-08-08T22:57:07.3822765Z   AZURE_FUNCTIONAPP_NAME: quem-mente-menos-api
+2025-08-08T22:57:07.3823099Z   RESOURCE_GROUP: rg-quem-mente-menos
+2025-08-08T22:57:07.3823374Z ##[endgroup]
+2025-08-08T22:57:07.3921904Z ##[group]Run chmod +x "$GITHUB_ACTION_PATH/setup.sh"
+2025-08-08T22:57:07.3922349Z [36;1mchmod +x "$GITHUB_ACTION_PATH/setup.sh"[0m
+2025-08-08T22:57:07.3995700Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2025-08-08T22:57:07.3996117Z env:
+2025-08-08T22:57:07.3996338Z   NODE_VERSION: 20.x
+2025-08-08T22:57:07.3996589Z   FLUTTER_VERSION: 3.24.0
+2025-08-08T22:57:07.3996900Z   AZURE_FUNCTIONAPP_NAME: quem-mente-menos-api
+2025-08-08T22:57:07.3997249Z   RESOURCE_GROUP: rg-quem-mente-menos
+2025-08-08T22:57:07.3997548Z ##[endgroup]
+2025-08-08T22:57:07.4152401Z ##[group]Run $GITHUB_ACTION_PATH/setup.sh -p \
+2025-08-08T22:57:07.4152808Z [36;1m$GITHUB_ACTION_PATH/setup.sh -p \[0m
+2025-08-08T22:57:07.4153111Z [36;1m  -n '3.24.0' \[0m
+2025-08-08T22:57:07.4153350Z [36;1m  -f '' \[0m
+2025-08-08T22:57:07.4153567Z [36;1m  -a 'X64' \[0m
+2025-08-08T22:57:07.4153791Z [36;1m  -k '' \[0m
+2025-08-08T22:57:07.4154008Z [36;1m  -c '' \[0m
+2025-08-08T22:57:07.4154216Z [36;1m  -l '' \[0m
+2025-08-08T22:57:07.4154437Z [36;1m  -d 'default' \[0m
+2025-08-08T22:57:07.4154775Z [36;1m  -g 'https://github.com/flutter/flutter.git' \[0m
+2025-08-08T22:57:07.4155133Z [36;1m  stable[0m
+2025-08-08T22:57:07.4193377Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2025-08-08T22:57:07.4193733Z env:
+2025-08-08T22:57:07.4193939Z   NODE_VERSION: 20.x
+2025-08-08T22:57:07.4194173Z   FLUTTER_VERSION: 3.24.0
+2025-08-08T22:57:07.4194461Z   AZURE_FUNCTIONAPP_NAME: quem-mente-menos-api
+2025-08-08T22:57:07.4194785Z   RESOURCE_GROUP: rg-quem-mente-menos
+2025-08-08T22:57:07.4195064Z ##[endgroup]
+2025-08-08T22:57:07.6286113Z ##[group]Run $GITHUB_ACTION_PATH/setup.sh \
+2025-08-08T22:57:07.6286496Z [36;1m$GITHUB_ACTION_PATH/setup.sh \[0m
+2025-08-08T22:57:07.6286784Z [36;1m  -n '3.24.0' \[0m
+2025-08-08T22:57:07.6287031Z [36;1m  -a 'x64' \[0m
+2025-08-08T22:57:07.6287357Z [36;1m  -c '/opt/hostedtoolcache/flutter/stable-3.24.0-x64' \[0m
+2025-08-08T22:57:07.6287744Z [36;1m  -d '/home/runner/.pub-cache' \[0m
+2025-08-08T22:57:07.6288024Z [36;1m  stable[0m
+2025-08-08T22:57:07.6328815Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2025-08-08T22:57:07.6329222Z env:
+2025-08-08T22:57:07.6329439Z   NODE_VERSION: 20.x
+2025-08-08T22:57:07.6329686Z   FLUTTER_VERSION: 3.24.0
+2025-08-08T22:57:07.6329986Z   AZURE_FUNCTIONAPP_NAME: quem-mente-menos-api
+2025-08-08T22:57:07.6330329Z   RESOURCE_GROUP: rg-quem-mente-menos
+2025-08-08T22:57:07.6330605Z ##[endgroup]
+2025-08-08T22:57:07.7810189Z   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+2025-08-08T22:57:07.7812555Z                                  Dload  Upload   Total   Spent    Left  Speed
+2025-08-08T22:57:07.7814054Z 
+2025-08-08T22:57:08.2989343Z   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+2025-08-08T22:57:09.2924484Z   7  639M    7 46.5M    0     0  90.3M      0  0:00:07 --:--:--  0:00:07 90.2M
+2025-08-08T22:57:10.3001920Z  27  639M   27  175M    0     0   115M      0  0:00:05  0:00:01  0:00:04  115M
+2025-08-08T22:57:11.2909892Z  55  639M   55  352M    0     0   139M      0  0:00:04  0:00:02  0:00:02  139M
+2025-08-08T22:57:11.9691161Z  81  639M   81  523M    0     0   148M      0  0:00:04  0:00:03  0:00:01  148M
+2025-08-08T22:57:11.9692492Z 100  639M  100  639M    0     0   152M      0  0:00:04  0:00:04 --:--:--  152M
+2025-08-08T22:57:39.0755244Z ##[group]Run flutter pub get
+2025-08-08T22:57:39.0755534Z [36;1mflutter pub get[0m
+2025-08-08T22:57:39.0797764Z shell: /usr/bin/bash -e {0}
+2025-08-08T22:57:39.0798008Z env:
+2025-08-08T22:57:39.0798179Z   NODE_VERSION: 20.x
+2025-08-08T22:57:39.0798608Z   FLUTTER_VERSION: 3.24.0
+2025-08-08T22:57:39.0798878Z   AZURE_FUNCTIONAPP_NAME: quem-mente-menos-api
+2025-08-08T22:57:39.0799191Z   RESOURCE_GROUP: rg-quem-mente-menos
+2025-08-08T22:57:39.0799551Z   FLUTTER_ROOT: /opt/hostedtoolcache/flutter/stable-3.24.0-x64
+2025-08-08T22:57:39.0799907Z   PUB_CACHE: /home/runner/.pub-cache
+2025-08-08T22:57:39.0800155Z ##[endgroup]
+2025-08-08T22:57:39.8616888Z 
+2025-08-08T22:57:39.8630400Z   ╔════════════════════════════════════════════════════════════════════════════╗
+2025-08-08T22:57:39.8632788Z   ║                 Welcome to Flutter! - https://flutter.dev                  ║
+2025-08-08T22:57:39.8635996Z   ║                                                                            ║
+2025-08-08T22:57:39.8636960Z   ║ The Flutter tool uses Google Analytics to anonymously report feature usage ║
+2025-08-08T22:57:39.8638050Z   ║ statistics and basic crash reports. This data is used to help improve      ║
+2025-08-08T22:57:39.8639152Z   ║ Flutter tools over time.                                                   ║
+2025-08-08T22:57:39.8639895Z   ║                                                                            ║
+2025-08-08T22:57:39.8640752Z   ║ Flutter tool analytics are not sent on the very first run. To disable      ║
+2025-08-08T22:57:39.8641733Z   ║ reporting, type 'flutter config --no-analytics'. To display the current    ║
+2025-08-08T22:57:39.8642782Z   ║ setting, type 'flutter config'. If you opt out of analytics, an opt-out    ║
+2025-08-08T22:57:39.8643813Z   ║ event will be sent, and then no further information will be sent by the    ║
+2025-08-08T22:57:39.8644749Z   ║ Flutter tool.                                                              ║
+2025-08-08T22:57:39.8645440Z   ║                                                                            ║
+2025-08-08T22:57:39.8646249Z   ║ By downloading the Flutter SDK, you agree to the Google Terms of Service.  ║
+2025-08-08T22:57:39.8647284Z   ║ The Google Privacy Policy describes how data is handled in this service.   ║
+2025-08-08T22:57:39.8648112Z   ║                                                                            ║
+2025-08-08T22:57:39.8653330Z   ║ Moreover, Flutter includes the Dart SDK, which may send usage metrics and  ║
+2025-08-08T22:57:39.8654346Z   ║ crash reports to Google.                                                   ║
+2025-08-08T22:57:39.8655130Z   ║                                                                            ║
+2025-08-08T22:57:39.8655944Z   ║ Read about data we send with crash reports:                                ║
+2025-08-08T22:57:39.8656945Z   ║ https://flutter.dev/to/crash-reporting                                     ║
+2025-08-08T22:57:39.8657792Z   ║                                                                            ║
+2025-08-08T22:57:39.8658763Z   ║ See Google's privacy policy:                                               ║
+2025-08-08T22:57:39.8659725Z   ║ https://policies.google.com/privacy                                        ║
+2025-08-08T22:57:39.8660553Z   ║                                                                            ║
+2025-08-08T22:57:39.8661369Z   ║ To disable animations in this tool, use                                    ║
+2025-08-08T22:57:39.8662335Z   ║ 'flutter config --no-cli-animations'.                                      ║
+2025-08-08T22:57:39.8663352Z   ╚════════════════════════════════════════════════════════════════════════════╝
+2025-08-08T22:57:39.8663809Z 
+2025-08-08T22:57:46.4269633Z Resolving dependencies in `/home/runner/work/mente/mente`...
+2025-08-08T22:57:47.5450688Z Because mentira_app depends on audio_recorder ^3.0.0 which doesn't match any versions, version solving failed.
+2025-08-08T22:57:47.6187608Z ##[error]Process completed with exit code 1.
+2025-08-08T22:57:47.6325766Z Post job cleanup.
+2025-08-08T22:57:47.6389351Z Post job cleanup.
+2025-08-08T22:57:47.7353473Z [command]/usr/bin/git version
+2025-08-08T22:57:47.7393637Z git version 2.50.1
+2025-08-08T22:57:47.7439583Z Temporarily overriding HOME='/home/runner/work/_temp/b382f25c-694b-4fe6-b2aa-51f4f55251bf' before making global git config changes
+2025-08-08T22:57:47.7441476Z Adding repository directory to the temporary git global config as a safe directory
+2025-08-08T22:57:47.7445831Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mente/mente
+2025-08-08T22:57:47.7490758Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-08-08T22:57:47.7536441Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-08-08T22:57:47.7779030Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-08-08T22:57:47.7804696Z http.https://github.com/.extraheader
+2025-08-08T22:57:47.7818924Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2025-08-08T22:57:47.7851466Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-08-08T22:57:47.8194708Z Cleaning up orphan processes

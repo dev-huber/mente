@@ -1,0 +1,44 @@
+﻿2025-08-08T22:57:39.0755224Z ##[group]Run flutter pub get
+2025-08-08T22:57:39.0755529Z [36;1mflutter pub get[0m
+2025-08-08T22:57:39.0797753Z shell: /usr/bin/bash -e {0}
+2025-08-08T22:57:39.0798004Z env:
+2025-08-08T22:57:39.0798175Z   NODE_VERSION: 20.x
+2025-08-08T22:57:39.0798601Z   FLUTTER_VERSION: 3.24.0
+2025-08-08T22:57:39.0798874Z   AZURE_FUNCTIONAPP_NAME: quem-mente-menos-api
+2025-08-08T22:57:39.0799187Z   RESOURCE_GROUP: rg-quem-mente-menos
+2025-08-08T22:57:39.0799524Z   FLUTTER_ROOT: /opt/hostedtoolcache/flutter/stable-3.24.0-x64
+2025-08-08T22:57:39.0799903Z   PUB_CACHE: /home/runner/.pub-cache
+2025-08-08T22:57:39.0800151Z ##[endgroup]
+2025-08-08T22:57:39.8616857Z 
+2025-08-08T22:57:39.8630383Z   ╔════════════════════════════════════════════════════════════════════════════╗
+2025-08-08T22:57:39.8632777Z   ║                 Welcome to Flutter! - https://flutter.dev                  ║
+2025-08-08T22:57:39.8635979Z   ║                                                                            ║
+2025-08-08T22:57:39.8636874Z   ║ The Flutter tool uses Google Analytics to anonymously report feature usage ║
+2025-08-08T22:57:39.8638035Z   ║ statistics and basic crash reports. This data is used to help improve      ║
+2025-08-08T22:57:39.8639140Z   ║ Flutter tools over time.                                                   ║
+2025-08-08T22:57:39.8639885Z   ║                                                                            ║
+2025-08-08T22:57:39.8640741Z   ║ Flutter tool analytics are not sent on the very first run. To disable      ║
+2025-08-08T22:57:39.8641723Z   ║ reporting, type 'flutter config --no-analytics'. To display the current    ║
+2025-08-08T22:57:39.8642770Z   ║ setting, type 'flutter config'. If you opt out of analytics, an opt-out    ║
+2025-08-08T22:57:39.8643800Z   ║ event will be sent, and then no further information will be sent by the    ║
+2025-08-08T22:57:39.8644737Z   ║ Flutter tool.                                                              ║
+2025-08-08T22:57:39.8645411Z   ║                                                                            ║
+2025-08-08T22:57:39.8646239Z   ║ By downloading the Flutter SDK, you agree to the Google Terms of Service.  ║
+2025-08-08T22:57:39.8647272Z   ║ The Google Privacy Policy describes how data is handled in this service.   ║
+2025-08-08T22:57:39.8648102Z   ║                                                                            ║
+2025-08-08T22:57:39.8653314Z   ║ Moreover, Flutter includes the Dart SDK, which may send usage metrics and  ║
+2025-08-08T22:57:39.8654332Z   ║ crash reports to Google.                                                   ║
+2025-08-08T22:57:39.8655118Z   ║                                                                            ║
+2025-08-08T22:57:39.8655934Z   ║ Read about data we send with crash reports:                                ║
+2025-08-08T22:57:39.8656924Z   ║ https://flutter.dev/to/crash-reporting                                     ║
+2025-08-08T22:57:39.8657761Z   ║                                                                            ║
+2025-08-08T22:57:39.8658753Z   ║ See Google's privacy policy:                                               ║
+2025-08-08T22:57:39.8659713Z   ║ https://policies.google.com/privacy                                        ║
+2025-08-08T22:57:39.8660540Z   ║                                                                            ║
+2025-08-08T22:57:39.8661360Z   ║ To disable animations in this tool, use                                    ║
+2025-08-08T22:57:39.8662323Z   ║ 'flutter config --no-cli-animations'.                                      ║
+2025-08-08T22:57:39.8663334Z   ╚════════════════════════════════════════════════════════════════════════════╝
+2025-08-08T22:57:39.8663802Z 
+2025-08-08T22:57:46.4269581Z Resolving dependencies in `/home/runner/work/mente/mente`...
+2025-08-08T22:57:47.5450643Z Because mentira_app depends on audio_recorder ^3.0.0 which doesn't match any versions, version solving failed.
+2025-08-08T22:57:47.6187258Z ##[error]Process completed with exit code 1.

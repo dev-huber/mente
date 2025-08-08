@@ -1,0 +1,48 @@
+﻿2025-08-08T22:57:02.7802048Z Current runner version: '2.327.1'
+2025-08-08T22:57:02.7858716Z ##[group]Runner Image Provisioner
+2025-08-08T22:57:02.7859853Z Hosted Compute Agent
+2025-08-08T22:57:02.7860693Z Version: 20250711.363
+2025-08-08T22:57:02.7861683Z Commit: 6785254374ce925a23743850c1cb91912ce5c14c
+2025-08-08T22:57:02.7862852Z Build Date: 2025-07-11T20:04:25Z
+2025-08-08T22:57:02.7863752Z ##[endgroup]
+2025-08-08T22:57:02.7864678Z ##[group]Operating System
+2025-08-08T22:57:02.7865574Z Ubuntu
+2025-08-08T22:57:02.7866306Z 24.04.2
+2025-08-08T22:57:02.7887626Z LTS
+2025-08-08T22:57:02.7888460Z ##[endgroup]
+2025-08-08T22:57:02.7889391Z ##[group]Runner Image
+2025-08-08T22:57:02.7890323Z Image: ubuntu-24.04
+2025-08-08T22:57:02.7891255Z Version: 20250804.2.0
+2025-08-08T22:57:02.7892984Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250804.2/images/ubuntu/Ubuntu2404-Readme.md
+2025-08-08T22:57:02.7895626Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250804.2
+2025-08-08T22:57:02.7897978Z ##[endgroup]
+2025-08-08T22:57:02.7899926Z ##[group]GITHUB_TOKEN Permissions
+2025-08-08T22:57:02.7902501Z Contents: read
+2025-08-08T22:57:02.7903535Z Metadata: read
+2025-08-08T22:57:02.7904341Z Packages: read
+2025-08-08T22:57:02.7905096Z ##[endgroup]
+2025-08-08T22:57:02.7928894Z Secret source: Actions
+2025-08-08T22:57:02.7930447Z Prepare workflow directory
+2025-08-08T22:57:02.8613741Z Prepare all required actions
+2025-08-08T22:57:02.8670265Z Getting action download info
+2025-08-08T22:57:03.2673981Z ##[group]Download immutable action package 'actions/checkout@v4'
+2025-08-08T22:57:03.2675074Z Version: 4.2.2
+2025-08-08T22:57:03.2676193Z Digest: sha256:ccb2698953eaebd21c7bf6268a94f9c26518a7e38e27e0b83c1fe1ad049819b1
+2025-08-08T22:57:03.2677841Z Source commit SHA: 11bd71901bbe5b1630ceea73d27597364c9af683
+2025-08-08T22:57:03.2678561Z ##[endgroup]
+2025-08-08T22:57:03.3446197Z ##[group]Download immutable action package 'actions/setup-node@v4'
+2025-08-08T22:57:03.3447360Z Version: 4.4.0
+2025-08-08T22:57:03.3448260Z Digest: sha256:9427cefe82346e992fb5b949e3569b39d537ae41aa3086483b14eceebfc16bc1
+2025-08-08T22:57:03.3449303Z Source commit SHA: 49933ea5288caeca8642d1e84afbd3f7d6820020
+2025-08-08T22:57:03.3450072Z ##[endgroup]
+2025-08-08T22:57:03.4446389Z Download action repository 'codecov/codecov-action@v3' (SHA:ab904c41d6ece82784817410c45d8b8c02684457)
+2025-08-08T22:57:03.7961928Z Download action repository 'SonarSource/sonarcloud-github-action@master' (SHA:13a24e453e2e6262f3bb0c5fa8241031e637a028)
+2025-08-08T22:57:04.1911664Z Getting action download info
+2025-08-08T22:57:04.2949302Z Download action repository 'SonarSource/sonarqube-scan-action@v5.0.0' (SHA:0303d6b62e310685c0e34d0b9cde218036885c4d)
+2025-08-08T22:57:04.7183425Z Getting action download info
+2025-08-08T22:57:04.8419777Z ##[group]Download immutable action package 'actions/cache@v4'
+2025-08-08T22:57:04.8421123Z Version: 4.2.4
+2025-08-08T22:57:04.8422483Z Digest: sha256:0ce81a78be9a512dff294f151044f903a6b54593e7b355dcbf964e8d583e47aa
+2025-08-08T22:57:04.8424558Z Source commit SHA: 0400d5f644dc74513175e3cd8d07132dd4860809
+2025-08-08T22:57:04.8426009Z ##[endgroup]
+2025-08-08T22:57:05.1480500Z Complete job name: Backend Quality Check
