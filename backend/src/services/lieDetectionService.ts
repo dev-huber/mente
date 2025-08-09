@@ -4,7 +4,7 @@
  */
 
 import { logger, createRequestLogger } from '../utils/logger';
-import { SpeechRecognitionResult } from './speechService';
+import { SpeechRecognitionResult } from '../utils/typescript-fixes';
 
 // Lie detection interfaces
 export interface LieDetectionRequest {

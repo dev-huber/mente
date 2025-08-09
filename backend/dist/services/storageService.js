@@ -40,7 +40,10 @@ class AudioStorageService {
             // Validate inputs
             const validation = this.validateUploadInputs(fileBuffer, fileName, metadata);
             if (!validation.success) {
-                return validation;
+                return {
+                    success: false,
+                    error: validation.error
+                };
             }
             // Generate unique blob name to prevent conflicts
             const blobName = this.generateBlobName(fileName, metadata.fileId);
