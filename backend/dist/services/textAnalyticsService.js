@@ -94,6 +94,10 @@ class TextAnalyticsService {
                 if (result.error) {
                     throw new Error(`Sentiment analysis failed: ${result.error.message}`);
                 }
+                // Verificar se o resultado tem as propriedades esperadas
+                if (!('sentiment' in result) || !('confidenceScores' in result) || !('sentences' in result)) {
+                    throw new Error('Invalid sentiment analysis result format');
+                }
                 // Mapear resultado para nosso formato
                 const sentenceAnalysis = result.sentences.map(s => ({
                     text: s.text,
@@ -127,6 +131,10 @@ class TextAnalyticsService {
                 if (result.error) {
                     throw new Error(`Key phrase extraction failed: ${result.error.message}`);
                 }
+                // Verificar se o resultado tem as propriedades esperadas
+                if (!('keyPhrases' in result)) {
+                    throw new Error('Invalid key phrases result format');
+                }
                 // Calcular relevância baseada em frequência
                 const phraseFrequency = new Map();
                 result.keyPhrases.forEach(phrase => {
@@ -151,6 +159,10 @@ class TextAnalyticsService {
                 if (result.error) {
                     throw new Error(`Entity recognition failed: ${result.error.message}`);
                 }
+                // Verificar se o resultado tem as propriedades esperadas
+                if (!('entities' in result)) {
+                    throw new Error('Invalid entity recognition result format');
+                }
                 return {
                     entities: result.entities.map(e => ({
                         text: e.text,
@@ -170,6 +182,10 @@ class TextAnalyticsService {
             if (result.error) {
                 throw new Error(`Language detection failed: ${result.error.message}`);
             }
+            // Verificar se o resultado tem as propriedades esperadas
+            if (!('primaryLanguage' in result)) {
+                throw new Error('Invalid language detection result format');
+            }
             return {
                 language: result.primaryLanguage.iso6391Name,
                 confidence: result.primaryLanguage.confidenceScore,
@@ -184,6 +200,10 @@ class TextAnalyticsService {
         try {
             const [result] = await this.client.recognizePiiEntities([text], language);
             if (result.error) {
+                return undefined;
+            }
+            // Verificar se o resultado tem as propriedades esperadas
+            if (!('redactedText' in result) || !('entities' in result)) {
                 return undefined;
             }
             return {
@@ -205,10 +225,10 @@ class TextAnalyticsService {
             throw new CustomErrors_1.ExternalServiceError('Texto inválido para análise', 'TextAnalyticsService', undefined, { operation: 'validateInput' });
         }
         if (text.trim().length < 3) {
-            throw new CustomErrors_1.ExternalServiceError('Texto muito curto para análise (mínimo 3 caracteres)', 'TextAnalyticsService', undefined, { operation: 'validateInput', textLength: text.length });
+            throw new CustomErrors_1.ExternalServiceError('Texto muito curto para análise (mínimo 3 caracteres)', 'TextAnalyticsService', undefined, { operation: 'validateInput' });
         }
         if (text.length > 5000) {
-            throw new CustomErrors_1.ExternalServiceError('Texto muito longo para análise (máximo 5000 caracteres)', 'TextAnalyticsService', undefined, { operation: 'validateInput', textLength: text.length });
+            throw new CustomErrors_1.ExternalServiceError('Texto muito longo para análise (máximo 5000 caracteres)', 'TextAnalyticsService', undefined, { operation: 'validateInput' });
         }
     }
     extractResult(result, fallback) {
@@ -268,7 +288,7 @@ class TextAnalyticsService {
             },
         };
     }
-    extractEmotions(result) {
+    extractEmotions(_result) {
         // Extrair emoções baseadas em opinion mining se disponível
         // Implementação simplificada - expandir conforme necessário
         return {

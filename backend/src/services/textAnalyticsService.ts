@@ -174,6 +174,11 @@ export class TextAnalyticsService {
           throw new Error(`Sentiment analysis failed: ${result.error.message}`);
         }
         
+        // Verificar se o resultado tem as propriedades esperadas
+        if (!('sentiment' in result) || !('confidenceScores' in result) || !('sentences' in result)) {
+          throw new Error('Invalid sentiment analysis result format');
+        }
+        
         // Mapear resultado para nosso formato
         const sentenceAnalysis = result.sentences.map(s => ({
           text: s.text,
@@ -216,6 +221,11 @@ export class TextAnalyticsService {
           throw new Error(`Key phrase extraction failed: ${result.error.message}`);
         }
         
+        // Verificar se o resultado tem as propriedades esperadas
+        if (!('keyPhrases' in result)) {
+          throw new Error('Invalid key phrases result format');
+        }
+        
         // Calcular relevância baseada em frequência
         const phraseFrequency = new Map<string, number>();
         result.keyPhrases.forEach(phrase => {
@@ -245,6 +255,11 @@ export class TextAnalyticsService {
           throw new Error(`Entity recognition failed: ${result.error.message}`);
         }
         
+        // Verificar se o resultado tem as propriedades esperadas
+        if (!('entities' in result)) {
+          throw new Error('Invalid entity recognition result format');
+        }
+        
         return {
           entities: result.entities.map(e => ({
             text: e.text,
@@ -267,6 +282,11 @@ export class TextAnalyticsService {
         throw new Error(`Language detection failed: ${result.error.message}`);
       }
       
+      // Verificar se o resultado tem as propriedades esperadas
+      if (!('primaryLanguage' in result)) {
+        throw new Error('Invalid language detection result format');
+      }
+      
       return {
         language: result.primaryLanguage.iso6391Name,
         confidence: result.primaryLanguage.confidenceScore,
@@ -277,11 +297,23 @@ export class TextAnalyticsService {
     }
   }
   
-  private async detectPII(text: string, language: string): Promise<any> {
+  private async detectPII(text: string, language: string): Promise<{
+    redactedText: string;
+    entities: Array<{
+      text: string;
+      category: string;
+      confidence: number;
+    }>;
+  } | undefined> {
     try {
       const [result] = await this.client.recognizePiiEntities([text], language);
       
       if (result.error) {
+        return undefined;
+      }
+      
+      // Verificar se o resultado tem as propriedades esperadas
+      if (!('redactedText' in result) || !('entities' in result)) {
         return undefined;
       }
       
@@ -314,7 +346,7 @@ export class TextAnalyticsService {
         'Texto muito curto para análise (mínimo 3 caracteres)',
         'TextAnalyticsService',
         undefined,
-        { operation: 'validateInput', textLength: text.length }
+        { operation: 'validateInput' }
       );
     }
     
@@ -323,7 +355,7 @@ export class TextAnalyticsService {
         'Texto muito longo para análise (máximo 5000 caracteres)',
         'TextAnalyticsService',
         undefined,
-        { operation: 'validateInput', textLength: text.length }
+        { operation: 'validateInput' }
       );
     }
   }
@@ -396,7 +428,14 @@ export class TextAnalyticsService {
     };
   }
   
-  private extractEmotions(result: any): any {
+  private extractEmotions(_result: unknown): {
+    joy: number;
+    sadness: number;
+    anger: number;
+    fear: number;
+    surprise: number;
+    disgust: number;
+  } {
     // Extrair emoções baseadas em opinion mining se disponível
     // Implementação simplificada - expandir conforme necessário
     return {
