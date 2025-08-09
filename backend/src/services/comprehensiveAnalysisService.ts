@@ -5,7 +5,16 @@
 
 import { logger, createRequestLogger } from '../utils/logger';
 // import { speechService } from './speechService'; // Não disponível ainda
-import { textAnalyticsService, TextAnalyticsRequest, ComprehensiveTextAnalysis, CrossAnalysisInsights, FinalAssessment, ConflictingSignal, ReinforcingPattern } from './textAnalyticsService';
+import { textAnalyticsService } from './textAnalyticsService';
+import { 
+  TextAnalyticsRequest, 
+  ComprehensiveTextAnalysis, 
+  CrossAnalysisInsights, 
+  FinalAssessment, 
+  ConflictingSignal, 
+  ReinforcingPattern,
+  AnalysisWeights
+} from '../types/comprehensive';
 import { lieDetectionService, LieDetectionRequest } from './lieDetectionService';
 
 // Comprehensive analysis interfaces

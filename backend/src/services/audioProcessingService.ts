@@ -16,6 +16,7 @@ export interface AudioAnalysisResult {
 export interface ProcessingContext {
   audioId: string;
   userId: string;
+  fileId?: string;
 }
 
 export class AudioProcessingService {
@@ -56,9 +57,28 @@ export class AudioProcessingService {
   }
 
   // Funções adicionais necessárias para compatibilidade
-  async validateUploadRequest(request: any): Promise<{ valid: boolean; error?: string }> {
+  async validateUploadRequest(request: any): Promise<{ success: boolean; data?: any; error?: string }> {
     console.log('[AudioProcessingService] Validating upload request (mock)...');
-    return { valid: true };
+    
+    if (!request || !request.body) {
+      return {
+        success: false,
+        error: 'Missing request body'
+      };
+    }
+    
+    // Mock file data extraction
+    const mockFileData = {
+      buffer: Buffer.from('mock audio data'),
+      mimeType: 'audio/wav',
+      originalName: 'test.wav',
+      size: 1024
+    };
+    
+    return {
+      success: true,
+      data: mockFileData
+    };
   }
 
   async processAudioFile(file: any, context: ProcessingContext): Promise<any> {
@@ -66,9 +86,13 @@ export class AudioProcessingService {
     return { success: true, audioId: context.audioId };
   }
 
-  handleUploadError(error: Error): any {
+  handleUploadError(error: Error, context?: Record<string, unknown>): unknown {
     console.log('[AudioProcessingService] Handling upload error (mock)...', error.message);
-    return { success: false, error: error.message };
+    return { 
+      success: false, 
+      error: error.message,
+      context 
+    };
   }
   
   private determineQuality(size: number): 'excellent' | 'good' | 'fair' | 'poor' {
@@ -82,7 +106,7 @@ export class AudioProcessingService {
 export const audioProcessingService = new AudioProcessingService();
 
 // Exports adicionais para compatibilidade
-export function validateUploadRequest(request: any): Promise<{ valid: boolean; error?: string }> {
+export function validateUploadRequest(request: any): Promise<{ success: boolean; data?: any; error?: string }> {
   return audioProcessingService.validateUploadRequest(request);
 }
 
@@ -90,6 +114,6 @@ export function processAudioFile(file: any, context: ProcessingContext): Promise
   return audioProcessingService.processAudioFile(file, context);
 }
 
-export function handleUploadError(error: Error): any {
-  return audioProcessingService.handleUploadError(error);
+export function handleUploadError(error: Error, context?: Record<string, unknown>): unknown {
+  return audioProcessingService.handleUploadError(error, context);
 }

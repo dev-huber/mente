@@ -42,15 +42,35 @@ class AudioProcessingService {
     // Funções adicionais necessárias para compatibilidade
     async validateUploadRequest(request) {
         console.log('[AudioProcessingService] Validating upload request (mock)...');
-        return { valid: true };
+        if (!request || !request.body) {
+            return {
+                success: false,
+                error: 'Missing request body'
+            };
+        }
+        // Mock file data extraction
+        const mockFileData = {
+            buffer: Buffer.from('mock audio data'),
+            mimeType: 'audio/wav',
+            originalName: 'test.wav',
+            size: 1024
+        };
+        return {
+            success: true,
+            data: mockFileData
+        };
     }
     async processAudioFile(file, context) {
         console.log('[AudioProcessingService] Processing audio file (mock)...');
         return { success: true, audioId: context.audioId };
     }
-    handleUploadError(error) {
+    handleUploadError(error, context) {
         console.log('[AudioProcessingService] Handling upload error (mock)...', error.message);
-        return { success: false, error: error.message };
+        return {
+            success: false,
+            error: error.message,
+            context
+        };
     }
     determineQuality(size) {
         if (size > 10000000)
@@ -71,6 +91,6 @@ function validateUploadRequest(request) {
 function processAudioFile(file, context) {
     return exports.audioProcessingService.processAudioFile(file, context);
 }
-function handleUploadError(error) {
-    return exports.audioProcessingService.handleUploadError(error);
+function handleUploadError(error, context) {
+    return exports.audioProcessingService.handleUploadError(error, context);
 }
