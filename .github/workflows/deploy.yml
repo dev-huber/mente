@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [ main ]
 
+# Add permissions for GitHub token
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   backend-quality:
     runs-on: ubuntu-latest
@@ -18,8 +24,8 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '20'
-        cache: 'npm'
+        node-version: 20
+        cache: npm
         cache-dependency-path: backend/package-lock.json
         
     - name: Install backend dependencies
@@ -48,7 +54,7 @@ jobs:
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.24.0'
+        flutter-version: 3.24.0
         
     - name: Install Flutter dependencies
       run: flutter pub get || echo "Flutter deps failed but continuing..."
@@ -61,6 +67,16 @@ jobs:
     needs: [backend-quality, flutter-quality]
     if: always()
     
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+    
+    # Deploy to the github-pages environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -68,8 +84,8 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '20'
-        cache: 'npm'
+        node-version: 20
+        cache: npm
         cache-dependency-path: backend/package-lock.json
         
     - name: Install dependencies
@@ -100,7 +116,7 @@ jobs:
             <p>✅ Deploy realizado com sucesso via GitHub Actions!</p>
             <p>📊 Status: Online</p>
             <p>🔗 Repositório: <a href="https://github.com/dev-huber/mente">https://github.com/dev-huber/mente</a></p>
-            <p>📅 Deploy: ' $(date) '</p>
+            <p>📅 Deploy: '"'"'$(date)'"'"'</p>
             
             <h2>📋 Endpoints Disponíveis:</h2>
             <ul>
@@ -120,9 +136,14 @@ jobs:
         </body>
         </html>' > dist/index.html
         
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v4
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+      
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./dist
-        cname: mentira-app.dev-huber.github.io
+        path: ./dist
+        
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
