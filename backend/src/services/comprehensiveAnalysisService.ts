@@ -49,14 +49,6 @@ export interface BaselineData {
     personalityProfile?: any;
 }
 
-export interface AnalysisWeights {
-    speechRecognition: number;
-    sentimentAnalysis: number;
-    lieDetection: number;
-    behavioralAnalysis: number;
-    linguisticAnalysis: number;
-}
-
 export interface ComprehensiveAnalysisResult {
     success: boolean;
     requestId: string;
@@ -172,10 +164,10 @@ export interface ModelPerformance {
 export class ComprehensiveAnalysisService {
     private readonly defaultWeights: AnalysisWeights = {
         speechRecognition: 0.25,
-        sentimentAnalysis: 0.20,
-        lieDetection: 0.30,
-        behavioralAnalysis: 0.15,
-        linguisticAnalysis: 0.10
+        sentiment: 0.20,
+        emotion: 0.30,
+        linguistic: 0.15,
+        context: 0.10
     };
 
     private readonly defaultOptions: ComprehensiveAnalysisOptions = {
@@ -447,8 +439,8 @@ export class ComprehensiveAnalysisService {
             conflictingSignals.push({
                 type: 'sentiment-behavior',
                 description: 'Positive sentiment conflicts with deception indicators',
-                severity: 'high',
-                implications: ['Possible emotional masking', 'Social desirability bias', 'Sophisticated deception']
+                severity: 0.8, // high = 0.8
+                sources: ['sentiment', 'behavior']
             });
         }
 
@@ -456,8 +448,8 @@ export class ComprehensiveAnalysisService {
             conflictingSignals.push({
                 type: 'emotion-linguistic',
                 description: 'Emotional instability conflicts with linguistic patterns',
-                severity: 'medium',
-                implications: ['Stress response', 'Memory issues', 'Emotional dysregulation']
+                severity: 0.6, // medium = 0.6
+                sources: ['emotion', 'linguistic']
             });
         }
 
@@ -465,8 +457,8 @@ export class ComprehensiveAnalysisService {
             conflictingSignals.push({
                 type: 'confidence-indicators',
                 description: 'Speech recognition confidence conflicts with lie detection confidence',
-                severity: 'low',
-                implications: ['Audio quality issues', 'Model uncertainty', 'Complex speech patterns']
+                severity: 0.3, // low = 0.3
+                sources: ['confidence', 'detection']
             });
         }
 
@@ -478,7 +470,8 @@ export class ComprehensiveAnalysisService {
                 type: 'consistent-stress',
                 description: 'Consistent emotional and behavioral stress patterns',
                 strength: (sentimentLieCorrelation + emotionalConsistency) / 2,
-                confidence: 0.8
+                confidence: 0.8,
+                sources: ['sentiment', 'emotion']
             });
         }
 
@@ -487,7 +480,8 @@ export class ComprehensiveAnalysisService {
                 type: 'aligned-sentiment',
                 description: 'Aligned linguistic and confidence indicators',
                 strength: (linguisticAlignment + confidenceAlignment) / 2,
-                confidence: 0.7
+                confidence: 0.7,
+                sources: ['linguistic', 'confidence']
             });
         }
 
@@ -497,7 +491,12 @@ export class ComprehensiveAnalysisService {
             linguisticAlignment,
             confidenceAlignment,
             conflictingSignals,
-            reinforcingPatterns
+            reinforcingPatterns,
+            // Propriedades adicionais requeridas pela interface
+            conflicts: conflictingSignals,
+            reinforcements: reinforcingPatterns,
+            overallCoherence: (emotionalConsistency + linguisticAlignment + confidenceAlignment) / 3,
+            analysisQuality: Math.min(1.0, (emotionalConsistency + linguisticAlignment) / 2)
         };
     }
 

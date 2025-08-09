@@ -3,6 +3,7 @@
 export interface TextAnalyticsRequest {
   text: string;
   requestId: string;
+  language?: string;
   options?: {
     enableSentiment?: boolean;
     enableKeyPhrases?: boolean;
@@ -13,18 +14,27 @@ export interface TextAnalyticsRequest {
 }
 
 export interface ComprehensiveTextAnalysis {
-  textAnalysis: any;
-  emotionalAnalysis: any;
-  linguisticAnalysis: any;
+  textAnalysis: unknown;
+  textAnalytics?: unknown;  
+  emotionalAnalysis: unknown;
+  linguisticAnalysis: unknown;
   confidenceScore: number;
   processingTime: number;
+  finalAssessment?: FinalAssessment;
+  crossAnalysis?: CrossAnalysisInsights;
 }
 
 export interface CrossAnalysisInsights {
   conflicts: ConflictingSignal[];
+  conflictingSignals: ConflictingSignal[];
   reinforcements: ReinforcingPattern[];
+  reinforcingPatterns: ReinforcingPattern[];
   overallCoherence: number;
   analysisQuality: number;
+  emotionalConsistency: number;
+  linguisticAlignment: number;
+  confidenceAlignment: number;
+  sentimentLieCorrelation: number;
 }
 
 export interface ConflictingSignal {
@@ -39,14 +49,18 @@ export interface ReinforcingPattern {
   description: string;
   strength: number;
   sources: string[];
+  confidence?: number;
 }
 
 export interface FinalAssessment {
   overallScore: number;
+  overallTruthfulness: number;
   confidence: number;
   reasoning: string;
   keyFactors: string[];
-  riskLevel: 'low' | 'medium' | 'high';
+  keyFindings: string[];
+  primaryConcerns: string[];
+  riskLevel: 'low' | 'medium' | 'high' | 'critical';
 }
 
 export interface AnalysisWeights {
@@ -54,4 +68,5 @@ export interface AnalysisWeights {
   emotion: number;
   linguistic: number;
   context: number;
+  speechRecognition?: number;
 }
