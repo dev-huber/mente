@@ -7,7 +7,7 @@
  */
 
 import crypto from 'crypto';
-import { Logger } from 'winston';
+import { DefensiveLogger } from './logger';
 import { createLogger } from './logger';
 
 interface SecretConfig {
@@ -25,7 +25,7 @@ interface SecretValidationResult {
 }
 
 export class SecretManager {
-  private logger: Logger;
+  private logger: DefensiveLogger;
   private config: SecretConfig;
   private currentSecret?: string;
   private secretCreatedAt?: Date;

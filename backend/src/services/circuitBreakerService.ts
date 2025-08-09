@@ -7,7 +7,7 @@
  * - Service-specific configuration
  */
 
-import { Logger } from 'winston';
+import { DefensiveLogger } from '../utils/logger';
 import { createLogger } from '../utils/logger';
 
 type CircuitState = 'CLOSED' | 'OPEN' | 'HALF_OPEN';
@@ -96,7 +96,7 @@ export class CircuitBreaker {
   private serviceName: string;
   private config: CircuitBreakerConfig;
   private metrics: CircuitMetrics;
-  private logger: Logger;
+  private logger: DefensiveLogger;
   private responseTimesWindow: number[] = [];
 
   constructor(serviceName: string, customConfig?: Partial<CircuitBreakerConfig>) {
@@ -474,7 +474,7 @@ export class CircuitBreaker {
 export class CircuitBreakerRegistry {
   private static instance: CircuitBreakerRegistry;
   private circuits = new Map<string, CircuitBreaker>();
-  private logger: Logger;
+  private logger: DefensiveLogger;
 
   private constructor() {
     this.logger = createLogger('CircuitBreakerRegistry');

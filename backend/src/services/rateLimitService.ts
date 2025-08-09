@@ -7,7 +7,7 @@
  * - Real-time metrics and monitoring
  */
 
-import { Logger } from 'winston';
+import { DefensiveLogger } from '../utils/logger';
 import { createLogger } from '../utils/logger';
 
 interface RateLimitConfig {
@@ -55,7 +55,7 @@ const ACTION_LIMITS = {
 };
 
 export class RateLimitService {
-  private logger: Logger;
+  private logger: DefensiveLogger;
   private config: RateLimitConfig;
   private redisClient: any = null;
   private memoryStore = new Map<string, any>();

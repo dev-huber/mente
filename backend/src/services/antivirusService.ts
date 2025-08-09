@@ -8,7 +8,7 @@
  */
 
 import crypto from 'crypto';
-import { Logger } from 'winston';
+import { DefensiveLogger } from '../utils/logger';
 import { createLogger } from '../utils/logger';
 
 interface ScanResult {
@@ -41,7 +41,7 @@ interface VirusScanConfig {
 }
 
 export class AntivirusService {
-  private logger: Logger;
+  private logger: DefensiveLogger;
   private config: VirusScanConfig;
   
   // Known malicious file signatures (simplified examples)

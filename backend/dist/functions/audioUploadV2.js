@@ -56,14 +56,9 @@ async function audioUpload(request, context) {
         // Step 2: Process audio file
         logger.info('Starting audio processing', { fileId });
         const processingContext = {
+            audioId: fileId,
+            userId: 'mock-user-id', // TODO: Obter do contexto de autenticação
             fileId,
-            fileName: fileData.originalName,
-            requestId,
-            context: {
-                uploadTimestamp: new Date().toISOString(),
-                userAgent: request.headers.get('user-agent') || 'unknown',
-                clientIP: request.headers.get('x-forwarded-for') || 'unknown'
-            }
         };
         const processingResult = await (0, audioProcessingService_1.processAudioFile)(fileData, processingContext);
         if (!processingResult.success) {
