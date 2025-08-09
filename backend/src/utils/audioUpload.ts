@@ -12,7 +12,7 @@ import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 
 // Configuração do multer com validação defensiva
-const upload = multer({
+const _upload = multer({
   limits: {
     fileSize: 50 * 1024 * 1024, // 50MB
     files: 1,
@@ -30,7 +30,7 @@ const upload = multer({
 
 export async function audioUpload(
   request: HttpRequest,
-  context: InvocationContext
+  _context: InvocationContext
 ): Promise<HttpResponseInit> {
   const requestId = uuidv4();
   const timer = logger.startTimer();
@@ -123,7 +123,12 @@ export async function audioUpload(
     };
     
     // Processar áudio (upload para storage)
-    const processedAudio = await audioProcessingService.processAudio(audioInput);
+    const processingContext = {
+      audioId: requestId, // Usando requestId como audioId temporariamente
+      userId,
+      fileId: requestId,
+    };
+    const processedAudio = await audioProcessingService.processAudioFile(audioInput, processingContext);
     
     // TODO: Implementar análise completa com AI
     // Por enquanto, retornar mock de análise
@@ -149,8 +154,21 @@ export async function audioUpload(
       },
     };
     
-    // Detectar mentira
-    const lieDetectionResult = await lieDetectionService.detectLie(mockAnalysis);
+    // Detectar mentira - usando o nome correto do método
+    const mockRequest = {
+      requestId,
+      speechResult: {
+        success: true,
+        transcription: mockAnalysis.transcription.text,
+        confidence: 0.85,
+      },
+      audioFeatures: mockAnalysis.vocalAnalysis,
+      metadata: {
+        userId,
+        sessionId: requestId,
+      },
+    };
+    const lieDetectionResult = await lieDetectionService.detectLies(mockRequest);
     
     // Preparar resposta
     const response = {
@@ -170,8 +188,8 @@ export async function audioUpload(
       duration,
       metadata: {
         audioId: processedAudio.id,
-        lieScore: lieDetectionResult.lieScore,
-        classification: lieDetectionResult.classification,
+        lieScore: lieDetectionResult.overallLieScore,
+        classification: lieDetectionResult.riskLevel,
       },
     });
     
@@ -237,7 +255,7 @@ export async function audioUpload(
 }
 
 // Função auxiliar para rate limiting
-async function checkRateLimit(userId: string): Promise<boolean> {
+async function checkRateLimit(_userId: string): Promise<boolean> {
   // TODO: Implementar rate limiting real com Redis
   // Por enquanto, sempre permite
   return false;
@@ -252,8 +270,8 @@ app.http('audioUpload', {
 
 // Health check endpoint
 export async function healthCheck(
-  request: HttpRequest,
-  context: InvocationContext
+  _request: HttpRequest,
+  _context: InvocationContext
 ): Promise<HttpResponseInit> {
   return {
     status: 200,

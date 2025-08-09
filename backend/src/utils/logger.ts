@@ -120,14 +120,14 @@ class DefensiveLogger {
     };
   }
   
-  private sanitize(data: any): any {
+  private sanitize(data: unknown): unknown {
     if (!data) return data;
     
     // Remove dados sensíveis
     const sensitiveKeys = ['password', 'token', 'secret', 'apiKey', 'authorization'];
     
-    if (typeof data === 'object') {
-      const sanitized = { ...data };
+    if (typeof data === 'object' && data !== null) {
+      const sanitized = { ...data as Record<string, unknown> };
       
       for (const key in sanitized) {
         if (sensitiveKeys.some(sensitive => key.toLowerCase().includes(sensitive))) {
@@ -175,9 +175,11 @@ class DefensiveLogger {
       message: error.message,
       stack: error.stack,
     } : { error };
+
+    const sanitizedContext = this.sanitize(enrichedContext) as Record<string, unknown>;
     
     this.logger.error(message, {
-      ...this.sanitize(enrichedContext),
+      ...sanitizedContext,
       error: errorObject,
     });
     
@@ -204,7 +206,7 @@ class DefensiveLogger {
   }
   
   // Método para medir performance
-  startTimer(): () => void {
+  startTimer(): () => number {
     const start = Date.now();
     return () => Date.now() - start;
   }
@@ -222,7 +224,7 @@ class DefensiveLogger {
       this.telemetryClient.trackMetric({
         name,
         value,
-        properties: enrichedContext as any,
+        properties: enrichedContext as Record<string, string>,
       });
     }
   }
@@ -232,11 +234,22 @@ class DefensiveLogger {
 export const logger = new DefensiveLogger();
 
 // Funções adicionais para compatibilidade
-export function createLogger(context?: LogContext): DefensiveLogger {
+export function createLogger(context?: LogContext | string): DefensiveLogger {
+  if (typeof context === 'string') {
+    // Se for string, trata como nome do serviço
+    logger.setDefaultContext({ service: context });
+  } else if (context) {
+    logger.setDefaultContext(context);
+  }
   return logger;
 }
 
-export function createRequestLogger(requestId?: string): DefensiveLogger {
+export function createRequestLogger(requestId?: string | LogContext): DefensiveLogger {
+  if (typeof requestId === 'string') {
+    logger.setDefaultContext({ requestId });
+  } else if (requestId) {
+    logger.setDefaultContext(requestId);
+  }
   return logger;
 }
 

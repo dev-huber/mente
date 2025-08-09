@@ -96,7 +96,7 @@ class DefensiveLogger {
             return data;
         // Remove dados sensíveis
         const sensitiveKeys = ['password', 'token', 'secret', 'apiKey', 'authorization'];
-        if (typeof data === 'object') {
+        if (typeof data === 'object' && data !== null) {
             const sanitized = { ...data };
             for (const key in sanitized) {
                 if (sensitiveKeys.some(sensitive => key.toLowerCase().includes(sensitive))) {
@@ -138,8 +138,9 @@ class DefensiveLogger {
             message: error.message,
             stack: error.stack,
         } : { error };
+        const sanitizedContext = this.sanitize(enrichedContext);
         this.logger.error(message, {
-            ...this.sanitize(enrichedContext),
+            ...sanitizedContext,
             error: errorObject,
         });
         if (this.telemetryClient) {
@@ -187,8 +188,21 @@ exports.DefensiveLogger = DefensiveLogger;
 exports.logger = new DefensiveLogger();
 // Funções adicionais para compatibilidade
 function createLogger(context) {
+    if (typeof context === 'string') {
+        // Se for string, trata como nome do serviço
+        exports.logger.setDefaultContext({ service: context });
+    }
+    else if (context) {
+        exports.logger.setDefaultContext(context);
+    }
     return exports.logger;
 }
 function createRequestLogger(requestId) {
+    if (typeof requestId === 'string') {
+        exports.logger.setDefaultContext({ requestId });
+    }
+    else if (requestId) {
+        exports.logger.setDefaultContext(requestId);
+    }
     return exports.logger;
 }
