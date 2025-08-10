@@ -200,7 +200,7 @@ export class ComprehensiveAnalysisService {
 
         requestLogger.info('Starting comprehensive analysis', {
             options: request.analysisOptions || this.defaultOptions,
-            metadata: request.metadata
+            metadata: request.metadata as Record<string, unknown>
         });
 
         try {
@@ -237,15 +237,15 @@ export class ComprehensiveAnalysisService {
                     text: speechResult.recognizedText,
                     requestId: request.requestId,
                     language: 'pt',
-                    analysisOptions: {
-                        enableSentimentAnalysis: true,
-                        enableKeyPhraseExtraction: true,
-                        enableEntityRecognition: true,
+                    options: {
+                        enableSentiment: true,
+                        enableKeyPhrases: true,
+                        enableEntities: true,
                         enableLanguageDetection: true,
-                        includeOpinionMining: options.enableDeepAnalysis ?? false
+                        enablePii: options.enableDeepAnalysis ?? false
                     }
                 };
-                textAnalyticsResult = await textAnalyticsService.analyzeText(textRequest);
+                textAnalyticsResult = await textAnalyticsService.analyzeText(textRequest.text, textRequest.language || 'pt');
                 
                 if (!textAnalyticsResult.success) {
                     requestLogger.warn('Text analytics failed, continuing with available data', {
@@ -379,12 +379,17 @@ export class ComprehensiveAnalysisService {
             textAnalyticsResult,
             lieDetectionResult,
             crossAnalysis,
-            weights
+            _weights
         );
 
         return {
+            textAnalysis: textAnalyticsResult || {},
             textAnalytics: textAnalyticsResult || this.createEmptyTextAnalyticsResult(),
             lieDetection: lieDetectionResult || this.createEmptyLieDetectionResult(),
+            emotionalAnalysis: {},
+            linguisticAnalysis: {},
+            confidenceScore: finalAssessment.confidence,
+            processingTime: Date.now() - Date.now(), // calculado em outro lugar
             crossAnalysis,
             finalAssessment
         };
@@ -590,13 +595,14 @@ export class ComprehensiveAnalysisService {
         ];
 
         return {
+            overallScore: overallTruthfulness,
             overallTruthfulness,
             confidence,
-            riskLevel,
-            primaryConcerns,
+            reasoning: primaryConcerns.join('; '),
+            keyFactors: keyFindings,
             keyFindings,
-            recommendations,
-            alternativeExplanations
+            primaryConcerns,
+            riskLevel
         };
     }
 
@@ -711,7 +717,7 @@ export class ComprehensiveAnalysisService {
             criticalRisks.push('High deception risk detected');
         }
         comprehensiveAnalysis.crossAnalysis.conflictingSignals.forEach(signal => {
-            if (signal.severity === 'high') {
+            if (signal.severity > 0.7) { // high threshold
                 criticalRisks.push(signal.description);
             }
         });
@@ -917,24 +923,34 @@ export class ComprehensiveAnalysisService {
 
     private createEmptyComprehensiveAnalysis(): ComprehensiveTextAnalysis {
         return {
+            textAnalysis: {},
             textAnalytics: this.createEmptyTextAnalyticsResult(),
             lieDetection: this.createEmptyLieDetectionResult(),
+            emotionalAnalysis: {},
+            linguisticAnalysis: {},
+            confidenceScore: 0,
+            processingTime: 0,
             crossAnalysis: {
                 sentimentLieCorrelation: 0,
                 emotionalConsistency: 0,
                 linguisticAlignment: 0,
                 confidenceAlignment: 0,
                 conflictingSignals: [],
-                reinforcingPatterns: []
+                reinforcingPatterns: [],
+                conflicts: [],
+                reinforcements: [],
+                overallCoherence: 0,
+                analysisQuality: 0
             },
             finalAssessment: {
+                overallScore: 0,
                 overallTruthfulness: 0,
                 confidence: 0,
-                riskLevel: 'critical',
-                primaryConcerns: ['Analysis failed'],
+                reasoning: 'Analysis failed',
+                keyFactors: [],
                 keyFindings: [],
-                recommendations: [],
-                alternativeExplanations: []
+                primaryConcerns: ['Analysis failed'],
+                riskLevel: 'critical'
             }
         };
     }

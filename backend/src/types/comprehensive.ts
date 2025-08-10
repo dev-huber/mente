@@ -16,6 +16,7 @@ export interface TextAnalyticsRequest {
 export interface ComprehensiveTextAnalysis {
   textAnalysis: unknown;
   textAnalytics?: unknown;  
+  lieDetection?: unknown;
   emotionalAnalysis: unknown;
   linguisticAnalysis: unknown;
   confidenceScore: number;
