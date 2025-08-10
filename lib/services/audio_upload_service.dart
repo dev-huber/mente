@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:dio/dio.dart';
+import '../core/config/app_config.dart';
 
 /// Defensive Audio Upload Service with retry mechanism and comprehensive error handling
 class AudioUploadService {
@@ -12,20 +13,18 @@ class AudioUploadService {
 
   final Logger _logger = Logger();
   final Dio _dio = Dio();
-  static const String _apiEndpoint = 'http://localhost:7071/api/audioUpload';
   static const int _maxRetries = 3;
-  static const Duration _timeoutDuration = Duration(seconds: 30);
 
   /// Initialize upload service with defensive configuration
   void initialize() {
     _dio.options = BaseOptions(
-      connectTimeout: _timeoutDuration,
-      receiveTimeout: _timeoutDuration,
-      sendTimeout: const Duration(minutes: 5), // Longer for file uploads
+      connectTimeout: AppConfig.apiTimeout,
+      receiveTimeout: AppConfig.apiTimeout,
+      sendTimeout: AppConfig.uploadTimeout,
       headers: {
         'Content-Type': 'multipart/form-data',
         'Accept': 'application/json',
-        'User-Agent': 'MentiraApp-Flutter/1.0.0',
+        'User-Agent': AppConfig.userAgent,
       },
     );
 
@@ -198,7 +197,7 @@ class AudioUploadService {
         _logger.i('Upload attempt $attempt/$_maxRetries');
 
         final response = await _dio.post(
-          _apiEndpoint,
+          AppConfig.audioUploadEndpoint,
           data: formData,
           options: Options(
             validateStatus: (status) => status != null && status >= 200 && status < 300,
@@ -318,10 +317,8 @@ class AudioUploadService {
   /// Check upload service health
   Future<AudioUploadResult<bool>> checkHealth() async {
     try {
-      final healthEndpoint = _apiEndpoint.replaceAll('/audioUpload', '/health');
-      
       final response = await _dio.get(
-        healthEndpoint,
+        AppConfig.healthEndpoint,
         options: Options(
           sendTimeout: const Duration(seconds: 10),
           receiveTimeout: const Duration(seconds: 10),

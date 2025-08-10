@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'pages/audio_capture_page.dart';
+import 'pages/simple_audio_capture_page.dart';
 
 /// Main application with defensive initialization and error boundaries
 void main() {
@@ -25,27 +25,19 @@ class MentiraApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (context) => AudioCaptureProvider(),
-          lazy: false, // Initialize immediately
-        ),
-      ],
-      child: MaterialApp(
-        title: 'Quem Mente Menos?',
-        debugShowCheckedModeBanner: false,
-        theme: _buildAppTheme(),
-        home: const ErrorBoundary(
-          child: AudioCapturePage(),
-        ),
-        builder: (context, child) {
-          // Global error boundary wrapper
-          return ErrorBoundary(
-            child: child ?? const SizedBox.shrink(),
-          );
-        },
+    return MaterialApp(
+      title: 'Quem Mente Menos?',
+      debugShowCheckedModeBanner: false,
+      theme: _buildAppTheme(),
+      home: const ErrorBoundary(
+        child: AudioCapturePage(),
       ),
+      builder: (context, child) {
+        // Global error boundary wrapper
+        return ErrorBoundary(
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
   }
 

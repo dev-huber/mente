@@ -329,11 +329,53 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
 
+  # Backend Deploy to Azure
+  backend-deploy:
+    name: Deploy Backend to Azure
+    runs-on: ubuntu-latest
+    needs: [backend-quality]
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: backend
+        run: npm ci
+      
+      - name: Build backend
+        working-directory: backend
+        run: npm run build
+      
+      - name: Create deployment package
+        working-directory: backend
+        run: |
+          mkdir deploy
+          cp -r dist/* deploy/
+          cp package.json deploy/
+          cp host.json deploy/
+          cd deploy && npm ci --only=production
+      
+      - name: Deploy to Azure Functions
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          package: './backend/deploy'
+          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+
   # Summary
   workflow-summary:
     name: Workflow Summary
     runs-on: ubuntu-latest
-    needs: [backend-quality, flutter-quality]
+    needs: [backend-quality, flutter-quality, backend-deploy]
     if: always()
     
     steps:
@@ -347,9 +389,14 @@ jobs:
           echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
           echo "| Backend Quality | ✅ |" >> $GITHUB_STEP_SUMMARY
           echo "| Flutter Quality | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "| Backend Deploy | ${{ needs.backend-deploy.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Repository | dev-huber/mente |" >> $GITHUB_STEP_SUMMARY
           echo "| Branch | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Commit | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔗 URLs" >> $GITHUB_STEP_SUMMARY
+          echo "- Frontend: https://dev-huber.github.io/mente/" >> $GITHUB_STEP_SUMMARY
+          echo "- Backend API: https://${{ env.AZURE_FUNCTIONAPP_NAME }}.azurewebsites.net" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 📅 Execution Time" >> $GITHUB_STEP_SUMMARY
           echo "$(date)" >> $GITHUB_STEP_SUMMARY
