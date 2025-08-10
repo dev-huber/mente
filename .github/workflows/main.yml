@@ -117,7 +117,7 @@ jobs:
             -x "*.md"
       
       - name: Upload backend artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: backend-deployment
           path: backend-deployment.zip
@@ -165,7 +165,7 @@ jobs:
         continue-on-error: true
       
       - name: Upload ${{ matrix.platform }} artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact-name }}
           path: ${{ matrix.artifact-path }}
@@ -190,7 +190,7 @@ jobs:
     
     steps:
       - name: Download web artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: web-release
           path: ./dist
@@ -294,7 +294,7 @@ jobs:
           token: ${{ secrets.PAT_TOKEN }}
       
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: ./artifacts
         continue-on-error: true
